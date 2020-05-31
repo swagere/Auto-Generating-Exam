@@ -33,13 +33,13 @@ public class LoginController {
     AjaxResponse login(@Valid @RequestBody Login login, HttpServletRequest httpServletRequest) {
 //        String username = (String) JSON.parseObject(str).get("username");
 //        String pwd = (String) JSON.parseObject(str).get("password");
-        String username = login.getUsername();
+        String name = login.getName();
         String password = login.getPassword();
-        loginService.login(username, password);
+        loginService.login(name, password);
 
         Map<String, Object> user = new HashMap<>();
-        user.put("user_id", loginService.getUserIdByUsername(username));
-        user.put("username", username);
+        user.put("user_id", loginService.getUserIdByUsername(name));
+        user.put("username", name);
         user.put("session", httpServletRequest.getSession().getId());
 
         //添加数据到session

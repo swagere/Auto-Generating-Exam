@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +18,7 @@ import javax.persistence.*;
 @Table(name = "user")
 public class User {
     @Id
-    @Column(length = 16, nullable = false)
+    @Column
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer user_id;
 
@@ -35,8 +36,9 @@ public class User {
     private String email;
 
     @Column
-    private int subject_id;
+    private Integer subject_id;
 
     @Column
-    private int code;
+    @NotNull(message = "验证码不能为空")
+    private Integer code;
 }

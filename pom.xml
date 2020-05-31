@@ -104,7 +104,7 @@
         </dependency>
         -->
 
-        <!--Bcrypt加密-->
+        <!--BCrypt加密-->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>

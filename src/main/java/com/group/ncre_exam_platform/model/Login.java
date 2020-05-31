@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @NoArgsConstructor
 public class Login {
     @NotBlank(message = "用户名不能为空")
-    private String username;
+    private String name;
 
     @NotBlank(message = "密码不能为空")
     private String password;
