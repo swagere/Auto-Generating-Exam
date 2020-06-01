@@ -39,7 +39,7 @@ public class LoginController {
 
         Map<String, Object> user = new HashMap<>();
         user.put("user_id", loginService.getUserIdByUsername(name));
-        user.put("username", name);
+        user.put("name", name);
         user.put("session", httpServletRequest.getSession().getId());
 
         //添加数据到session

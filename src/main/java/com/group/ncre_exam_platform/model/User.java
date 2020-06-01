@@ -41,4 +41,7 @@ public class User {
     @Column
     @NotNull(message = "验证码不能为空")
     private Integer code;
+
+    @Column
+    private Long exam_time;
 }
