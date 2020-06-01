@@ -31,8 +31,6 @@ public class LoginController {
     @PostMapping("/login")
     public @ResponseBody
     AjaxResponse login(@Valid @RequestBody Login login, HttpServletRequest httpServletRequest) {
-//        String username = (String) JSON.parseObject(str).get("username");
-//        String pwd = (String) JSON.parseObject(str).get("password");
         String name = login.getName();
         String password = login.getPassword();
         loginService.login(name, password);

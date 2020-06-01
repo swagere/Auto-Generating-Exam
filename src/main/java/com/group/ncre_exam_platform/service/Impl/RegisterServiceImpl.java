@@ -24,10 +24,13 @@ public class RegisterServiceImpl implements RegisterService {
         //检验姓名是否重复
         checkNameRepeat(user.getName());
 
-        //检验邮箱是否重复
-        checkEmailRepeat(user.getEmail());
+        //检验邮箱是否被重复注册 若已被注册则报错
+        Integer user_id = getUserIdByEmail(user.getEmail());
+        if (user_id != null) {
+            throw new CustomException(CustomExceptionType.USER_INPUT_ERROR,"邮箱已被注册");
+        }
 
-        //检查验证码是否正确
+        //检查验证码 redis
 
 
         //密码加密存储
@@ -54,11 +57,8 @@ public class RegisterServiceImpl implements RegisterService {
     }
 
     @Override
-    public void checkEmailRepeat(String receiver) {
-        Integer user_id = userRepository.getUserIdByEmail(receiver);
-        if (user_id != null) {
-            throw new CustomException(CustomExceptionType.USER_INPUT_ERROR,"邮箱已被注册");
-        }
+    public Integer getUserIdByEmail(String receiver) {
+        return userRepository.getUserIdByEmail(receiver);
     }
 
     @Override

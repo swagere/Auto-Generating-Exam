@@ -5,6 +5,6 @@ import com.group.ncre_exam_platform.model.User;
 public interface RegisterService {
     void saveUser(User user);
     void sendEmail(String receiver);
-    void checkEmailRepeat(String receiver);
+    Integer getUserIdByEmail(String receiver);
     void checkNameRepeat(String name);
 }

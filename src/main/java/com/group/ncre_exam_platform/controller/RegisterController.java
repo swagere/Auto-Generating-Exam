@@ -40,10 +40,17 @@ public class RegisterController {
     @PostMapping("/sendEmail")
     public @ResponseBody AjaxResponse sendEmail(@RequestBody String str){
         String receiver = JSON.parseObject(str).get("email").toString();
+        //检验邮箱是否为空
         if (receiver == null || receiver.equals("")) {
             throw new CustomException(CustomExceptionType.USER_INPUT_ERROR,"邮箱为空");
         }
-        registerService.checkEmailRepeat(receiver);
+
+        //检验邮箱是否被重复注册 若已被注册则报错
+        Integer user_id = registerService.getUserIdByEmail(receiver);
+        if (user_id != null) {
+            throw new CustomException(CustomExceptionType.USER_INPUT_ERROR,"邮箱已被注册");
+        }
+
         registerService.sendEmail(receiver);
         return AjaxResponse.success();
     }
