@@ -1,10 +1,10 @@
 spring:
   datasource:
     #打包时选择带有localhost的url, 本地测试选择有ip地址的url
-    url: jdbc:mysql://localhost:3306/ncresystem?useUnicode=true&characterEncoding=utf-8&useSSL=false
-    #url: jdbc:mysql://121.36.18.182:3306/ojsystem?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    #url: jdbc:mysql://localhost:3306/ncresystem?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://39.97.70.229:3306/ncresystem?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
-    #password: rpz2020^
+    #password: ncre^2020
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     initialization-mode: always
@@ -29,6 +29,3 @@ spring:
     properties.mail.smtp.starttls.required: true
     properties.mail.smtp.ssl.enable: true
     default-encoding: utf-8
-
-  server:
-    port: 8080
