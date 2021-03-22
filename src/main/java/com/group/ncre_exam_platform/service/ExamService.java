@@ -6,9 +6,5 @@ import java.util.ArrayList;
 
 public interface ExamService {
     ArrayList getRealExamList(String s);
-    ArrayList getRealExam(Integer exam_id, Integer user_id);
-
-    String List2String(ArrayList<String> list);
-    ArrayList<String> String2List(String s);
     Exam.Subject String2Subject(String s);
 }
