@@ -2,10 +2,10 @@ spring:
   datasource:
     #打包时选择带有localhost的url, 本地测试选择有ip地址的url
     #url: jdbc:mysql://localhost:3306/ncresystem?useUnicode=true&characterEncoding=utf-8&useSSL=false
-    url: jdbc:mysql://39.97.70.229:3306/ncresystem?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://121.36.18.182:3306/auto_generating_exam?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
-    #password: ncre^2020
-    password: 123456
+    password: ncre^2020
+#    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     initialization-mode: always
   jpa:
@@ -13,7 +13,7 @@ spring:
     ddl-auto: validate
     #      ddl-auto: update
     database: mysql
-    show-sql: true
+    show-sql: false
 
   mail:
     host: smtp.qq.com #发送邮件服务器
