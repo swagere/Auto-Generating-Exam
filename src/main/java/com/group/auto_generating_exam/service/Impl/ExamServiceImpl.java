@@ -53,7 +53,7 @@ public class ExamServiceImpl implements ExamService {
                 Question question =  questionRepository.getQuestionByQuestionId(question_id);
 
                 //保存到数据库
-                UserExamQuestion userExamQuestion = new UserExamQuestion(user_id, exam_id, question_id,0, null, 0, 0);
+                UserExamQuestion userExamQuestion = new UserExamQuestion(user_id, exam_id, question_id,0, null, 0, 0, 0);
                 userExamQuestionRepository.save(userExamQuestion);
 
                 //传到前端页面
@@ -112,6 +112,19 @@ public class ExamServiceImpl implements ExamService {
     public Boolean isStuInExam(Integer exam_id, Integer user_id) {
         String sub_id = examRepository.getSubIdByExamId(exam_id);
         return subjectService.isStuInSub(sub_id, user_id);
+    }
+
+    //用户是否已交卷
+    @Override
+    public Boolean isCommit(Integer exam_id, Integer user_id) {
+        List<UserExamQuestion> list = userExamQuestionRepository.getUserExamQuestion(exam_id, user_id);
+        if (!list.isEmpty()) {
+            Integer isCommit = list.get(0).getIs_commit();
+            if (isCommit == 1) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

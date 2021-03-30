@@ -31,7 +31,7 @@ public class ExamController {
         Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
         Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
 
-        //用户是否选择这门课程 即是否有这个考试
+        //用户是否选择这门课程 即用户是否能参与这个考试
         Boolean isStuInExam = examService.isStuInExam(exam_id, user_id);
         if (!isStuInExam) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"用户没有选择该课程，不能参与考试"));
@@ -49,6 +49,11 @@ public class ExamController {
         }
         if (examIsProgressing.equals("over")) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束"));
+        }
+
+        //考试是否已交卷
+        if (examService.isCommit(exam_id, user_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"用户已交卷"));
         }
 
         //获取该试卷题目列表

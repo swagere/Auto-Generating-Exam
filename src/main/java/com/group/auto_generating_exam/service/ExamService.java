@@ -7,4 +7,5 @@ public interface ExamService {
     String examIsProgressing(Integer exam_id);
     Boolean isExamExist(Integer exam_id);
     Boolean isStuInExam(Integer exam_id, Integer user_id);
+    Boolean isCommit(Integer exam_id, Integer user_id);
 }

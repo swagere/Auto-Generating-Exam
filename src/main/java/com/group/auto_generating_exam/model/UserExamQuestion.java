@@ -37,4 +37,7 @@ public class UserExamQuestion implements Serializable {
 
     @Column
     private Integer is_judge;
+
+    @Column
+    private Integer is_commit;
 }
