@@ -4,6 +4,11 @@ import org.springframework.boot.configurationprocessor.json.JSONArray;
 
 import java.util.ArrayList;
 
+/**
+ *
+ * @Author KVE
+ */
+
 public class ToolUtil {
 
     //list转string
