@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.group</groupId>
-    <artifactId>ncre_exam_platform</artifactId>
+    <artifactId>auto_generating_exam</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ncre_exam_platform</name>
-    <description>ncre_exam_platform</description>
+    <name>auto_generating_exam</name>
+    <description>auto_generating_exam</description>
 
     <properties>
         <java.version>1.8</java.version>
