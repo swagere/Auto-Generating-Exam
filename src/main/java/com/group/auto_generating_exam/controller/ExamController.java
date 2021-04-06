@@ -1,6 +1,7 @@
 package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.group.auto_generating_exam.config.auto_generating.BasicGene;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
@@ -66,22 +67,17 @@ public class ExamController {
         return AjaxResponse.success(questionList);
     }
 
-//    /**
-//     * 用户获得真题
-//     * 分发试卷到个人表中 向前端传回试卷
-//     * @param str
-//     * @param httpServletRequest
-//     * @return
-//     */
-//    @RequestMapping("/getRealExam")
-//    public @ResponseBody
-//    AjaxResponse getRealExam (@RequestBody String str, HttpServletRequest httpServletRequest) {
-//
-//        Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
-//        Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString());
-//
-//        ArrayList realExam = examService.getRealExam(exam_id, user_id);
-//
-//        return AjaxResponse.success(realExam);
-//    }
+    @RequestMapping("/getExam")
+    public @ResponseBody AjaxResponse getExam() {
+        BasicGene.IntelligentTestSystem intelligentTestSystem = new BasicGene.IntelligentTestSystem();
+        intelligentTestSystem.Initial();
+
+        for (int epoch = 0; epoch < 1000; epoch++) {
+            intelligentTestSystem.CalculateFitness();
+            intelligentTestSystem.Sort();
+            intelligentTestSystem.Generate();
+        }
+
+        return AjaxResponse.success();
+    }
 }
