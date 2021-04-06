@@ -2,7 +2,7 @@ package com.group.auto_generating_exam.config.auto_generating;
 
 import java.util.Date;
 import java.util.Random;
-import com.group.auto_generating_exam.util.timeUtils;
+import com.group.auto_generating_exam.util.TimeUtils;
 
 /**
  * 基于选择的基础之上
@@ -49,7 +49,7 @@ public class BasicGene {
             InitialSample();
 
             Date date=new Date();
-            Random rand = new Random(5 * (int) timeUtils.getSecondTimestamp(date));
+            Random rand = new Random(5 * (int) TimeUtils.getSecondTimestamp(date));
 
             for (int i = 0; i < population; i++)  //随机生成染色体
             {
@@ -148,7 +148,7 @@ public class BasicGene {
         {
 
             Date date=new Date();
-            Random rand = new Random(5 * (int) timeUtils.getSecondTimestamp(date));
+            Random rand = new Random(5 * (int) TimeUtils.getSecondTimestamp(date));
 
             chromosome[son][0] = chromosome[father][0] + (rand.nextInt(200) - 100) / 100.0;
             chromosome[son][1] = chromosome[father][1] + (rand.nextInt(200) - 100) / 100.0;
@@ -158,7 +158,7 @@ public class BasicGene {
         public void Generate()
         {
             Date date=new Date();
-            Random rand = new Random(7 * (int) timeUtils.getSecondTimestamp(date));
+            Random rand = new Random(7 * (int) TimeUtils.getSecondTimestamp(date));
 
             //选取前30个个体为优秀种群
 

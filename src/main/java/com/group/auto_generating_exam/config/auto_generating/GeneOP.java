@@ -1,5 +1,10 @@
 package com.group.auto_generating_exam.config.auto_generating;
 
+import com.group.auto_generating_exam.util.TimeUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 public class GeneOP
@@ -80,6 +85,8 @@ public class GeneOP
         }
     }
 
+
+
     public static class IntellientTestSystem {
 
         static int population = 100;
@@ -87,13 +94,13 @@ public class GeneOP
 
         public QuestionDatabase database = new QuestionDatabase();
 
-        int[,] chromosome = new int[population, maxNumber];
+        int[][] chromosome = new int[population][maxNumber];
         double[] fitness = new double[population];
 
         //--常量---------------------------
         int score;
         double diff;
-        public int testNumber;
+        int testNumber;
         int[] testKind = new int[50];
         int[] hardDistribute = new int[50];
         int[] chapterDistribute = new int[50];
@@ -102,11 +109,12 @@ public class GeneOP
 
         int[] paperOrder = new int[maxNumber];
 
-        Random myRand = new Random(unchecked(5 * (int)DateTime.Now.Ticks));
+        Date date=new Date();
+        Random myRand = new Random(5 * (int) TimeUtils.getSecondTimestamp(date));
         Logestic logestic1 = new Logestic();
         Logestic logestic2 = new Logestic();
 
-        public int SetPaperAttribut(int _score, double _diff, int[] _kind,int[] _hard, int[] _chap, int[] _impo) {
+        public int SetPaperAttribute(int _score, double _diff, int[] _kind,int[] _hard, int[] _chap, int[] _impo) {
             score = _score;
             diff = _diff;
             testKind = (int[]) _kind.clone();
@@ -128,8 +136,17 @@ public class GeneOP
             return 1;
         }
 
+        public List GetPaperAttribute() {
+            List out = new ArrayList();
+            out.add(score);
+            out.add(diff);
+            out.add((int[])testKind.clone());
+            out.add((int[])chapterDistribute.clone());
+            out.add((int[])importanceDistribute.clone());
+            out.add((int[])paperOrder.clone());
 
-
+            return out;
+        }
 
         //--低分辨率下的遗传算法------------
         //初始化 生成试卷
@@ -143,7 +160,7 @@ public class GeneOP
                     for (int k = 0; k < testKind[nKind]; k++) {
                         // 生成一套卷子
                         // 低分辨率下，随机生成每道题的编号，每道题的编号为类的编号
-                        chromosome[i, count ++] = database.GetRandQuestionClusterOrderByKind(nKind);
+                        chromosome[i][count ++] = database.GetRandQuestionClusterOrderByKind(nKind);
                     }
                 }
             }
@@ -155,7 +172,7 @@ public class GeneOP
             int[] cc = new int[testNumber];
 
             for (int i = 0; i < testNumber; i++) {
-                cc[i] = chromosome[n, i];
+                cc[i] = chromosome[n][i];
             }
 
             for (int i = 0; i < testNumber; i++) {
@@ -244,7 +261,7 @@ public class GeneOP
             double thisScore = 0;
 
             for (int i = 0; i < testNumber; i++) {
-                int order = chromosome[n, i];
+                int order = chromosome[n][i];
                 question q = database.GetQuestionClusterByOrder(order);
 
                 int nScore = q.score;
@@ -269,7 +286,7 @@ public class GeneOP
             }
 
             error[2] = 1 - CalculateRelativity(thisHardDistribute, hardDistribute, 5);
-            error[3] = 1 - CalculateRelativity(thisChapterDistribute, ChapterDistribute, 20);
+            error[3] = 1 - CalculateRelativity(thisChapterDistribute, chapterDistribute, 20);
             error[4] = 1 - CalculateRelativity(thisHardDistribute, importanceDistribute, 5);
 
             // 规范误差
@@ -305,9 +322,9 @@ public class GeneOP
         //交换两套试卷（即交换两个个体）
         public void swapChromosome(int i, int j) {
             for (int h = 0; h < testNumber; h++) {
-                int ch0 = chromosome[i, h];
-                chromosome[i, h]; = chromosome[j, h];
-                chromosome[j, h] = ch0;
+                int ch0 = chromosome[i][h];
+                chromosome[i][h] = chromosome[j][h];
+                chromosome[j][h] = ch0;
             }
         }
 
@@ -320,11 +337,13 @@ public class GeneOP
             // 将适应度低的（即试卷好的）放在前面
             // 冒泡
             for (int j = 0; j < population; j++) {
-                if (fitness[i] > fitness[i - 1]) {
-                    instead = fitness[i - 1];
-                    fitness[i - 1] = fitness[1];
-                    fitness[1] = instead;
-                    swapChromosome(i, i - 1); //交换两个对应的试卷
+                for (int i = population - 1; i > 0; i--) {
+                    if (fitness[i] > fitness[i - 1]) {
+                        instead = fitness[i - 1];
+                        fitness[i - 1] = fitness[1];
+                        fitness[1] = instead;
+                        swapChromosome(i, i - 1); //交换两个对应的试卷
+                    }
                 }
             }
         }
@@ -336,13 +355,13 @@ public class GeneOP
 
             // 前面部分为父亲，后面部分为母亲
             for (int i = 0; i < t; i++) {
-                chromosome[son, i] = chromosome[father, i];
-                chromosome[daughter, i] = chromosome[mother, i];
+                chromosome[son][i] = chromosome[father][i];
+                chromosome[daughter][i] = chromosome[mother][i];
             }
 
             for (int j = t; j < testNumber; j++) {
-                chromosome[son, j] = chromosome[mother, j];
-                chromosome[daughter, j] = chromosome[father, j];
+                chromosome[son][j] = chromosome[mother][j];
+                chromosome[daughter][j] = chromosome[father][j];
             }
         }
 
@@ -350,27 +369,28 @@ public class GeneOP
         public void aberrance(int father, int son) {
             //先将父亲的基因全部复制给儿子
             for (int i = 0; i < testNumber; i++) {
-                chromosome[son, i] = chromosome[father, i];
+                chromosome[son][i] = chromosome[father][i];
             }
 
             //随机产生整数
             int t = (int)(logistic2.nextValue()*testNumber);
 
-            question q = database.GetQuestionClusterByOrder(chromosome[father, t]);
+            question q = database.GetQuestionClusterByOrder(chromosome[father][t]);
 
             //在t处改变题的难度/区分度
-            chromosome[son, t] = database.GetRandQuestionClusterOrderByKind(q, kind); //保持同一题型
+            chromosome[son][t] = database.GetRandQuestionClusterOrderByKind(q.kind); //保持同一题型
         }
 
         //产生新的种群
         public void generateNewGroup() {
-            Random random = new Random(unchecked(7 * (int)DataTime.Now.Ticks));
+            Date date=new Date();
+            Random random = new Random(7 * (int) TimeUtils.getSecondTimestamp(date));
 
             // 将排序好后的前31个个体当作优秀个体，产生更大规模的种群
             // 交叉
             for (int k = 31; k < 80; k += 2) {
-                int father = random.Next(31);
-                int mother = random.Next(31);
+                int father = random.nextInt(31);
+                int mother = random.nextInt(31);
 
                 // 产生两个新的组卷方案
                 int son = k;
@@ -381,7 +401,7 @@ public class GeneOP
 
             //变异
             for (int k = 81; k < 100; k++) {
-                int father = random.Next(31); //选出一个父亲
+                int father = random.nextInt(31); //选出一个父亲
                 int son = k;
                 aberrance(father, son);
             }
@@ -403,7 +423,7 @@ public class GeneOP
                     for (int k = 0; k < testKind[nKind]; k++) {
                         // 生成一套卷子
                         // 随机取得一道题的编号
-                        chromosome[i, count ++] = database.GetRandQuestionOrderInSameCluster(clusterTheme[count]);
+                        chromosome[i][count ++] = database.GetRandQuestionOrderInSameCluster(clusterTheme[count]);
                     }
                 }
             }
@@ -414,10 +434,10 @@ public class GeneOP
             //先进行排序
             for (int i = 0; i < testNumber; i++) {
                 for (int j = 0; j < testNumber - i - 1; j++) {
-                    if (chromosome[n, j] > chromosome[n, j + 1]) {
-                        int t = chromosome[n, j];
-                        chromosome[n, j] = chromosome[n, j + 1];
-                        chromosome[n, j + 1] = t;
+                    if (chromosome[n][j] > chromosome[n][j + 1]) {
+                        int t = chromosome[n][j];
+                        chromosome[n][j] = chromosome[n][j + 1];
+                        chromosome[n][j + 1] = t;
                     }
                 }
             }
@@ -427,7 +447,7 @@ public class GeneOP
             //再计算同一类的题目的数目
             for (int i = 1; i < testNumber - 1; i++) {
                 // 防止出的题目是一样的 如果一个题目出了两次，则罚函数的值增加
-                if (chromosome[n, i] == chromosome[n, i + 1]) {
+                if (chromosome[n][i] == chromosome[n][i + 1]) {
                     collision += 1000;
                 }
             }
@@ -443,7 +463,7 @@ public class GeneOP
             double thisScore = 0;
 
             for (int i = 0; i < testNumber; i++) {
-                int order = chromosome[n, i];
+                int order = chromosome[n][i];
                 question q = database.GetQuestionClusterByOrder(order);
 
                 int nScore = q.score;
@@ -468,7 +488,7 @@ public class GeneOP
             }
 
             error[2] = 1 - CalculateRelativity(thisHardDistribute, hardDistribute, 5);
-            error[3] = 1 - CalculateRelativity(thisChapterDistribute, ChapterDistribute, 20);
+            error[3] = 1 - CalculateRelativity(thisChapterDistribute, chapterDistribute, 20);
             error[4] = 1 - CalculateRelativity(thisHardDistribute, importanceDistribute, 5);
 
             // 规范误差
@@ -508,11 +528,13 @@ public class GeneOP
             // 将适应度低的（即试卷好的）放在前面
             // 冒泡
             for (int j = 0; j < population; j++) {
-                if (fitness[i] > fitness[i - 1]) {
-                    instead = fitness[i - 1];
-                    fitness[i - 1] = fitness[1];
-                    fitness[1] = instead;
-                    swapChromosome(i, i - 1); //交换两个对应的试卷
+                for (int i = population - 1; i > 0; i--) {
+                    if (fitness[i] > fitness[i - 1]) {
+                        instead = fitness[i - 1];
+                        fitness[i - 1] = fitness[1];
+                        fitness[1] = instead;
+                        swapChromosome(i, i - 1); //交换两个对应的试卷
+                    }
                 }
             }
         }
@@ -523,37 +545,38 @@ public class GeneOP
 
             // 前面部分为父亲，后面部分为母亲
             for (int i = 0; i < t; i++) {
-                chromosome[son, i] = chromosome[father, i];
-                chromosome[daughter, i] = chromosome[mother, i];
+                chromosome[son][i] = chromosome[father][i];
+                chromosome[daughter][i] = chromosome[mother][i];
             }
 
             for (int j = t; j < testNumber; j++) {
-                chromosome[son, j] = chromosome[mother, j];
-                chromosome[daughter, j] = chromosome[father, j];
+                chromosome[son][j] = chromosome[mother][j];
+                chromosome[daughter][j] = chromosome[father][j];
             }
         }
 
         public void aberrance_highResolution(int father, int son) {
             //先将父亲的基因全部复制给儿子
             for (int i = 0; i < testNumber; i++) {
-                chromosome[son, i] = chromosome[father, i];
+                chromosome[son][i] = chromosome[father][i];
             }
 
             //随机产生整数
             int t = (int)(logistic2.nextValue()*testNumber);
 
             //在t处改变题的难度/区分度
-            chromosome[son, t] = database.GetRandQuestionInSameCluster(clusterTheme[t]); //保持同一类中的题【clusterTheme为组卷模式，clusterTheme[t]为第t位置是为哪个类，从这个类中得到题目编号】
+            chromosome[son][t] = database.GetRandQuestionInSameCluster(clusterTheme[t]); //保持同一类中的题【clusterTheme为组卷模式，clusterTheme[t]为第t位置是为哪个类，从这个类中得到题目编号】
         }
 
         public void generateNewGroup_highResolution() {
-            Random random = new Random(unchecked(7 * (int)DataTime.Now.Ticks));
+            Date date=new Date();
+            Random random = new Random(7 * (int) TimeUtils.getSecondTimestamp(date));
 
             // 将排序好后的前31个个体当作优秀个体，产生更大规模的种群
             // 交叉
             for (int k = 31; k < 80; k += 2) {
-                int father = random.Next(31);
-                int mother = random.Next(31);
+                int father = random.nextInt(31);
+                int mother = random.nextInt(31);
 
                 // 产生两个新的组卷方案
                 int son = k;
@@ -564,7 +587,7 @@ public class GeneOP
 
             //变异
             for (int k = 81; k < 100; k++) {
-                int father = random.Next(31); //选出一个父亲
+                int father = random.nextInt(31); //选出一个父亲
                 int son = k;
                 aberrance_highResolution(father, son);
             }
@@ -580,7 +603,7 @@ public class GeneOP
             double thisScore = 0;
 
             for (int i = 0; i < testNumber; i++) {
-                int order = chromosome[n, i];
+                int order = chromosome[n][i];
                 question q = database.GetQuestionOrder(order);
 
                 int nScore = q.score;
@@ -627,22 +650,22 @@ public class GeneOP
             for (int n = 0; n < population; n++) {
                 for (int i = 0; i < testNumber; i++) {
                     for (int j = 0; j < testNumber - i - 1; j++) {
-                        int t = chromosome[n, j + 1];
-                        chromosome[n, j] = chromosome[n, j + 1];
-                        chromosome[n, j + 1] = t;
+                        int t = chromosome[n][j + 1];
+                        chromosome[n][j] = chromosome[n][j + 1];
+                        chromosome[n][j + 1] = t;
                     }
                 }
             }
 
-            int[, ] theme = new int[population, maxNumber];
+            int[][] theme = new int[population][maxNumber];
             double[] themeFitness = new double[population];
 
-            theme = (int[,])chromosome.Clone();
-            themeFitness = (double[])fitness.Clone();
+            theme = (int[][])chromosome.clone();
+            themeFitness = (double[])fitness.clone();
 
 
             for (int i = 0; i < testNumber; i++) {
-                clusterTheme[i] = chromosome[0,i]; // 将产生的模式存在clusterTheme中
+                clusterTheme[i] = chromosome[0][i]; // 将产生的模式存在clusterTheme中
             }
 
 

@@ -2,7 +2,7 @@ package com.group.auto_generating_exam.util;
 
 import java.util.Date;
 
-public class timeUtils {
+public class TimeUtils {
     /**
      * 获取精确到秒的时间戳
      *
