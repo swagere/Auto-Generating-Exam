@@ -35,3 +35,5 @@ server:
     key-store: src/main/resources/kve-ssl-key.p12
     key-store-password: hj12281468
     key-store-type: PKCS12
+  port: 7788
+  httpPort: 7788
