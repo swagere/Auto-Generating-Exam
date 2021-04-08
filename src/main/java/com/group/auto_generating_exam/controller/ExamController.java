@@ -1,7 +1,7 @@
 package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.group.auto_generating_exam.config.auto_generating.BasicGene;
+import com.group.auto_generating_exam.config.gene.BasicGene;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;

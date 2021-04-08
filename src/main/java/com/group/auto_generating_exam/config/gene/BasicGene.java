@@ -1,4 +1,4 @@
-package com.group.auto_generating_exam.config.auto_generating;
+package com.group.auto_generating_exam.config.gene;
 
 import java.util.Date;
 import java.util.Random;
