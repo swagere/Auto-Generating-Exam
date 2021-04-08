@@ -49,4 +49,7 @@ public class Question implements Serializable {
     @Column
     @Enumerated(EnumType.STRING)
     private QuestionType question_type  = null;
+
+    @Column
+    private String tip;
 }

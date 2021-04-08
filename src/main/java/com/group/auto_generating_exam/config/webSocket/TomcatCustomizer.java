@@ -4,7 +4,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.websocket.server.WsSci;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +50,18 @@ public class TomcatCustomizer {
         //监听到http的端口号后转向到的https的端口号
         connector.setRedirectPort(httpsPort);
         return connector;
+    }
+
+    @Bean
+    public TomcatContextCustomizer tomcatContextCustomizer() {
+
+        return new TomcatContextCustomizer() {
+            @Override
+            public void customize(Context context) {
+                context.addServletContainerInitializer(new WsSci(), null);
+            }
+
+        };
     }
 
 }

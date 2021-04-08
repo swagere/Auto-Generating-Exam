@@ -1,11 +1,9 @@
 package com.group.auto_generating_exam.service.Impl;
 
-import com.group.auto_generating_exam.dao.ExamQuestionRepository;
-import com.group.auto_generating_exam.dao.ExamRepository;
-import com.group.auto_generating_exam.dao.QuestionRepository;
-import com.group.auto_generating_exam.dao.UserExamQuestionRepository;
+import com.group.auto_generating_exam.dao.*;
 import com.group.auto_generating_exam.model.GetExamQuestion;
 import com.group.auto_generating_exam.model.Question;
+import com.group.auto_generating_exam.model.TestCase;
 import com.group.auto_generating_exam.model.UserExamQuestion;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.SubjectService;
@@ -36,6 +34,8 @@ public class ExamServiceImpl implements ExamService {
     UserExamQuestionRepository userExamQuestionRepository;
     @Autowired
     SubjectService subjectService;
+    @Autowired
+    TestCaseRepository testCaseRepository;
 
     //获取试卷列表（学生开始答题）
     @Override
@@ -62,7 +62,7 @@ public class ExamServiceImpl implements ExamService {
                 userExamQuestionRepository.save(userExamQuestion);
 
                 //传到前端页面
-                GetExamQuestion getQuestion = new GetExamQuestion(question_id, question.getQuestion(), question.getOptions(), question.getQuestion_type());
+                GetExamQuestion getQuestion = new GetExamQuestion(question_id, question.getQuestion(), question.getOptions(), question.getQuestion_type(), question.getTip(),null, null);
                 if (question.getQuestion_type() == Question.QuestionType.Single) {
                     singleList.add(getQuestion);
                 }
@@ -73,6 +73,11 @@ public class ExamServiceImpl implements ExamService {
                     discussionList.add(getQuestion);
                 }
                 else if (question.getQuestion_type() == Question.QuestionType.Normal_Program || question.getQuestion_type() == Question.QuestionType.SpecialJudge_Program) {
+                    TestCase testCase = testCaseRepository.getTestCaseByQuestionId(question_id);
+                    String input = testCase.getInput();
+                    String output = testCase.getOutput();
+                    getQuestion.setInput(input);
+                    getQuestion.setOutput(output);
                     programList.add(getQuestion);
                 }
             }

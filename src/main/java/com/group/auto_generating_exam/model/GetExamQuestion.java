@@ -13,4 +13,7 @@ class GetExamQuestion implements Serializable {
     String question;
     String options;
     Question.QuestionType question_type;
+    String tip;
+    String input;
+    String output;
 }
