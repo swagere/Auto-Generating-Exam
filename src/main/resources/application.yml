@@ -29,3 +29,9 @@ spring:
     properties.mail.smtp.starttls.required: true
     properties.mail.smtp.ssl.enable: true
     default-encoding: utf-8
+
+server:
+  ssl:
+    key-store: src/main/resources/kve-ssl-key.p12
+    key-store-password: hj12281468
+    key-store-type: PKCS12
