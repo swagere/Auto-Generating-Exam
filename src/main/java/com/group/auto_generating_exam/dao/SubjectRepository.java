@@ -8,5 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface SubjectRepository extends JpaRepository<Subject, String> {
     @Query("select s from Subject s where s.sub_id = ?1")
-    Subject getSubjectBySubId(String sub_id);
+    Subject getSubjectBySubId(Integer sub_id);
+
+    @Query("select s.user_id from Subject s where s.sub_id = ?1")
+    Integer getUserIdBySubId(String sub_id);
 }

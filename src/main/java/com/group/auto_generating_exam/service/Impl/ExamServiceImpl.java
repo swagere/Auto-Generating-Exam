@@ -149,5 +149,28 @@ public class ExamServiceImpl implements ExamService {
         }
         return true;
     }
+
+    //根据exam_id获取sub_id
+    @Override
+    public String getSubIdByExamId(Integer exam_id) {
+        return examRepository.getSubIdByExamId(exam_id);
+    }
+
+    //更新考试持续时间
+    @Override
+    public void saveLastTime(Long last_time, Integer exam_id) {
+        examRepository.updateLastTime(last_time, exam_id);
+    }
+
+    //结束考试
+    @Override
+    public void endExam(Integer exam_id) {
+        //获得考试开始时间
+        Long begin_time = examRepository.getBeginTimeByExamId(exam_id);
+        Long now_time = System.currentTimeMillis();
+        Long last_time = now_time - begin_time;
+        examRepository.updateLastTime(last_time, exam_id);
+        examRepository.updateProgressStatus(exam_id, Exam.ProgressStatus.DONE);
+    }
 }
 

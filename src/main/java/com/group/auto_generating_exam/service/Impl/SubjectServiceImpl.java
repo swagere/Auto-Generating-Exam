@@ -26,6 +26,10 @@ import java.util.Map;
 public class SubjectServiceImpl implements SubjectService {
     @Autowired
     UserSubjectRepository userSubjectRepository;
+    @Autowired
+    ExamRepository examRepository;
+    @Autowired
+    SubjectRepository subjectRepository;
 
     //获取试卷列表（学生开始答题）
     @Override
@@ -35,6 +39,11 @@ public class SubjectServiceImpl implements SubjectService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Integer getUserIdBySubId(String sub_id) {
+        return subjectRepository.getUserIdBySubId(sub_id);
     }
 }
 

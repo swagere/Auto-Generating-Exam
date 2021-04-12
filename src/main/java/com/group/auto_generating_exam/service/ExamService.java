@@ -17,4 +17,7 @@ public interface ExamService {
     Boolean isCommit(Integer exam_id, Integer user_id);
     Exam.ProgressStatus getExamProgressStatus(Integer Exam);
     Boolean isGetStuExamQuestion(Integer exam_id, Integer user_id);
+    String getSubIdByExamId(Integer exam_id);
+    void saveLastTime(Long last_time, Integer exam_id);
+    void endExam(Integer exam_id);
 }

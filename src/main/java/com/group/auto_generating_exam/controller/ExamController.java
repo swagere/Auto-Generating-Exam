@@ -7,6 +7,7 @@ import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
 import com.group.auto_generating_exam.model.Exam;
 import com.group.auto_generating_exam.service.ExamService;
+import com.group.auto_generating_exam.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,8 @@ import java.util.Map;
 public class ExamController {
     @Autowired
     ExamService examService;
+    @Autowired
+    SubjectService subjectService;
 
     /**
      * 获得试卷列表
@@ -75,6 +78,11 @@ public class ExamController {
         return AjaxResponse.success(questionList);
     }
 
+
+    /**
+     * 组卷
+     * @return
+     */
     @RequestMapping("/getExam")
     public @ResponseBody AjaxResponse getExam() {
         BasicGene.IntelligentTestSystem intelligentTestSystem = new BasicGene.IntelligentTestSystem();
@@ -89,11 +97,70 @@ public class ExamController {
         return AjaxResponse.success();
     }
 
+
     /**
+     * 更改考试时间
      * 若考试时间改变，则通知前端新的持续时间
      */
+    @RequestMapping("/changeExamTime")
+    public @ResponseBody AjaxResponse changeExamTime(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        Long last_time = Long.valueOf(JSON.parseObject(str).get("last_time").toString());
+        Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
+        Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
+
+        //判断是否是老师
+
+        //判断该老师是否是该考试发起者
+        String sub_id = examService.getSubIdByExamId(exam_id);
+        Integer tea_id = subjectService.getUserIdBySubId(sub_id);
+        if (!user_id.equals(tea_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该老师无权更改此考试时间"));
+        }
+
+        //判断该考试是否已经结束 若结束则无法修改
+        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
+        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束，无法修改考试时间"));
+        }
+
+        //修改考试时间
+        examService.saveLastTime(last_time, exam_id);
+
+        //通知前端？
+
+        return AjaxResponse.success();
+    }
+
 
     /**
      * 若考试提前结束，则通知前端
      */
+    @RequestMapping("/endExam")
+    public @ResponseBody AjaxResponse endExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
+        Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
+
+        //判断是否是老师
+
+        //判断该老师是否是该考试发起者
+        String sub_id = examService.getSubIdByExamId(exam_id);
+        Integer tea_id = subjectService.getUserIdBySubId(sub_id);
+        if (!user_id.equals(tea_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该老师无权更改此考试时间"));
+        }
+
+        //判断该考试是否已经结束 若结束则无法修改
+        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
+        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束，无法修改考试时间"));
+        }
+
+        //结束考试
+        examService.endExam(exam_id);
+
+        //通知前端？
+
+        return AjaxResponse.success();
+    }
+
 }
