@@ -1,4 +1,4 @@
-package com.group.auto_generating_exam.config.webSocket;
+package com.group.auto_generating_exam.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
