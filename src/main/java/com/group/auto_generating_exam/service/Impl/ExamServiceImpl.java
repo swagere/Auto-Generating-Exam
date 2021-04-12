@@ -1,10 +1,7 @@
 package com.group.auto_generating_exam.service.Impl;
 
 import com.group.auto_generating_exam.dao.*;
-import com.group.auto_generating_exam.model.GetExamQuestion;
-import com.group.auto_generating_exam.model.Question;
-import com.group.auto_generating_exam.model.TestCase;
-import com.group.auto_generating_exam.model.UserExamQuestion;
+import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.SubjectService;
 import lombok.extern.slf4j.Slf4j;
@@ -101,21 +98,21 @@ public class ExamServiceImpl implements ExamService {
     }
 
     //判断考试是否正在进行
-    @Override
-    public String examIsProgressing(Integer exam_id) {
-        //判断考试时间是否开始 考试是否结束
-        Long exam_time = examRepository.getBeginTimeByExamId(exam_id);
-        Long last_time = examRepository.getLastTimeByExamId(exam_id);
-        Long now_time = System.currentTimeMillis();
-
-        if (exam_time > now_time) {
-            return "will";
-        }
-        else if (exam_time + last_time * 60000 < now_time) {
-            return "over";
-        }
-        return "progressing";
-    }
+//    @Override
+//    public String examIsProgressing(Integer exam_id) {
+//        //判断考试时间是否开始 考试是否结束
+//        Long exam_time = examRepository.getBeginTimeByExamId(exam_id);
+//        Long last_time = examRepository.getLastTimeByExamId(exam_id);
+//        Long now_time = System.currentTimeMillis();
+//
+//        if (exam_time > now_time) {
+//            return "will";
+//        }
+//        else if (exam_time + last_time * 60000 < now_time) {
+//            return "over";
+//        }
+//        return "progressing";
+//    }
 
     //用户是否有该门考试
     @Override
@@ -135,6 +132,22 @@ public class ExamServiceImpl implements ExamService {
             }
         }
         return false;
+    }
+
+    //返回考试状态
+    @Override
+    public Exam.ProgressStatus getExamProgressStatus(Integer exam_id) {
+        return examRepository.getProgressStatusByExamId(exam_id);
+    }
+
+    //判断是否已经获取试卷（user_exam_question）
+    @Override
+    public Boolean isGetStuExamQuestion(Integer exam_id, Integer user_id) {
+        List<UserExamQuestion> questions = userExamQuestionRepository.getUserExamQuestion(exam_id, user_id);
+        if (questions.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }
 

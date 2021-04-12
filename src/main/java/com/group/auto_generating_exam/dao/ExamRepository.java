@@ -16,4 +16,7 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
 
     @Query("select s.sub_id from Exam s where s.exam_id = ?1")
     String getSubIdByExamId(Integer exam_id);
+
+    @Query("select s.progress_status from Exam s where s.exam_id = ?1")
+    Exam.ProgressStatus getProgressStatusByExamId(Integer exam_id);
 }

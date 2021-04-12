@@ -5,6 +5,7 @@ import com.group.auto_generating_exam.config.gene.BasicGene;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
+import com.group.auto_generating_exam.model.Exam;
 import com.group.auto_generating_exam.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,7 +34,7 @@ public class ExamController {
      */
     @RequestMapping("/getQuestionList")
     public @ResponseBody
-    AjaxResponse getRealExamList (@RequestBody String str, HttpServletRequest httpServletRequest) {
+    AjaxResponse getQuestionList (@RequestBody String str, HttpServletRequest httpServletRequest) {
         Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
         Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
 
@@ -49,11 +50,18 @@ public class ExamController {
         }
 
         //考试是否正在进行
-        String examIsProgressing = examService.examIsProgressing(exam_id);
-        if (examIsProgressing.equals("will")) {
+//        String examIsProgressing = examService.examIsProgressing(exam_id);
+//        if (examIsProgressing.equals("will")) {
+//            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始"));
+//        }
+//        if (examIsProgressing.equals("over")) {
+//            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束"));
+//        }
+        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
+        if (progress_status.equals(Exam.ProgressStatus.WILL)) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始"));
         }
-        if (examIsProgressing.equals("over")) {
+        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束"));
         }
 
@@ -80,4 +88,12 @@ public class ExamController {
 
         return AjaxResponse.success();
     }
+
+    /**
+     * 若考试时间改变，则通知前端新的持续时间
+     */
+
+    /**
+     * 若考试提前结束，则通知前端
+     */
 }
