@@ -20,4 +20,6 @@ public interface ExamService {
     String getSubIdByExamId(Integer exam_id);
     void saveLastTime(Long last_time, Integer exam_id);
     void endExam(Integer exam_id);
+    Long getRestTimeByExamId(Integer exam_id, Long last_time);
+    Long getLastTime(Integer exam_id);
 }

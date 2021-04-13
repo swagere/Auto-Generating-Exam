@@ -172,5 +172,19 @@ public class ExamServiceImpl implements ExamService {
         examRepository.updateLastTime(last_time, exam_id);
         examRepository.updateProgressStatus(exam_id, Exam.ProgressStatus.DONE);
     }
+
+    //返回考试剩余时间 如果考试未开始则返回null
+    @Override
+    public Long getRestTimeByExamId(Integer exam_id, Long last_time) {
+        Long begin_time = examRepository.getBeginTimeByExamId(exam_id);
+        Long now_time = System.currentTimeMillis();
+        return last_time * 60000 - (now_time - begin_time);
+    }
+
+    //返回考试持续时间
+    @Override
+    public Long getLastTime(Integer exam_id) {
+        return examRepository.getLastTimeByExamId(exam_id);
+    }
 }
 

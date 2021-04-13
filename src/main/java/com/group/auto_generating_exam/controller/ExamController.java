@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -103,7 +104,7 @@ public class ExamController {
      * 若考试时间改变，则通知前端新的持续时间
      */
     @RequestMapping("/changeExamTime")
-    public @ResponseBody AjaxResponse changeExamTime(@RequestBody String str, HttpServletRequest httpServletRequest) {
+    public @ResponseBody AjaxResponse changeExamTime(@RequestBody String str, HttpServletRequest httpServletRequest) throws IOException {
         Long last_time = Long.valueOf(JSON.parseObject(str).get("last_time").toString());
         Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
         Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
@@ -123,10 +124,27 @@ public class ExamController {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束，无法修改考试时间"));
         }
 
+        //判断修改时间是否小于已经进行的考试时间
+        Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
+        if (rest_time < 0) {
+            //如果修改时间小于已经考试的时间
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"不能小于考试已持续的时间"));
+        }
+
         //修改考试时间
         examService.saveLastTime(last_time, exam_id);
 
-        //通知前端？
+
+        // 如果考试未开始则不用通知前端
+        if (rest_time > last_time * 60000) {
+            System.out.println("1");
+            return AjaxResponse.success();
+        }
+        else {
+            //通知所有在考试的前端
+            System.out.println("2");
+            WebSocketServer.socketChangExamTime(rest_time);
+        }
 
         return AjaxResponse.success();
     }
@@ -136,7 +154,7 @@ public class ExamController {
      * 若考试提前结束，则通知前端
      */
     @RequestMapping("/endExam")
-    public @ResponseBody AjaxResponse endExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
+    public @ResponseBody AjaxResponse endExam(@RequestBody String str, HttpServletRequest httpServletRequest) throws IOException {
         Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
         Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
 
@@ -146,19 +164,27 @@ public class ExamController {
         String sub_id = examService.getSubIdByExamId(exam_id);
         Integer tea_id = subjectService.getUserIdBySubId(sub_id);
         if (!user_id.equals(tea_id)) {
-            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该老师无权更改此考试时间"));
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该老师无权提前结束该考试"));
         }
 
-        //判断该考试是否已经结束 若结束则无法修改
+
+        //判断该考试是否已经结束 若结束则无法提前终止
         Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
         if (progress_status.equals(Exam.ProgressStatus.DONE)) {
-            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束，无法修改考试时间"));
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束"));
+        }
+
+        //判断该考试是否还未开始 若还未开始则无法提前终止
+        if (progress_status.equals(Exam.ProgressStatus.WILL)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始，无法提前结束"));
         }
 
         //结束考试
         examService.endExam(exam_id);
 
-        //通知前端？
+        //通知所有在考试的前端
+        WebSocketServer.socketEndExam(exam_id);
+
 
         return AjaxResponse.success();
     }
