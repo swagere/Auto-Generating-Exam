@@ -57,8 +57,11 @@ public class JudgeServiceImpl implements JudgeService {
             throw new CustomException(CustomExceptionType.USER_INPUT_ERROR, "编程语言不能为空");
         }
 
-        String url = LoadBalanceUtils.GetUrl(testCaseId);
+//        String url = LoadBalanceUtils.GetUrl(testCaseId);
+
+        String url = "http://121.36.18.182:10085/judge";
         log.info("url:"+url);
+
         RestTemplate restTemplate = new RestTemplate();
 
         JSONObject jsonObject = new JSONObject();
@@ -88,7 +91,7 @@ public class JudgeServiceImpl implements JudgeService {
         String jsonStr = JSON.toJSONString(body);
         String result = doPost(url, jsonStr);
         log.info("result" + result);
-        log.info("strjson" + jsonStr);
+//        log.info("strjson" + jsonStr);
         return JSON.parseObject(result);
         /*
         body.add("src", src);
@@ -433,7 +436,7 @@ public class JudgeServiceImpl implements JudgeService {
                 judgeResult.setLanguage(language);
 
                 //获取用户名
-                judgeResult.setUsername(userRepository.findNameByUserId(user_id));
+                judgeResult.setUsername(userRepository.getNameByUserId(user_id));
 
                 //获取测试用例结果列表
                 int count = 0;

@@ -21,7 +21,7 @@ public class User implements Serializable {
     @Id
     @Column
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private String user_id;
+    private Integer user_id;
 
     @Column
     @NotBlank(message = "姓名不能为空")

@@ -215,10 +215,10 @@ public class ExamController {
 //        Map userInfo = (Map) request.getSession().getAttribute("userInfo");
 //        Integer stu_id = (Integer) userInfo.get("id");
 
-        Integer stu_id = getProgram.getUser_id();
+        Integer user_id = getProgram.getUser_id();
         JSONObject json = judgeService.judge(getProgram.getCode(), getProgram.getLanguage(), getProgram.getQuestion_id());
         log.info("判题成功");
-        JudgeResult judgeResult = judgeService.transformToResult(json, stu_id, getProgram.getCode(), getProgram.getLanguage(), getProgram.getQuestion_id(), getProgram.getExam_id());
+        JudgeResult judgeResult = judgeService.transformToResult(json, user_id, getProgram.getCode(), getProgram.getLanguage(), getProgram.getQuestion_id(), getProgram.getExam_id());
         return AjaxResponse.success(judgeResult);
     }
 }

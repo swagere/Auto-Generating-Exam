@@ -12,5 +12,5 @@ import javax.transaction.Transactional;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("select u.name from User u where u.user_id = ?1")
-    String findNameByUserId(Integer stu_id);
+    String getNameByUserId(Integer user_id);
 }
