@@ -21,7 +21,7 @@ public class LoadBalanceUtils {
         count.put(1, 0);
         count.put(2, 0);
     }
-    public static String GetUrl(Long id) {
+    public static String GetUrl(Integer id) {
         //权重数组
         Map<Integer,Integer> weights = new HashMap<>();
         weights.put(0, 0);

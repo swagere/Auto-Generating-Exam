@@ -27,7 +27,7 @@ public class UserExamQuestion implements Serializable {
     private Integer question_id;
 
     @Column
-    private Integer grade;
+    private Integer score;
 
     @Column
     private String answer;
