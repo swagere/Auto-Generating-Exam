@@ -26,4 +26,6 @@ public interface ExamService {
     Long getLastTime(Integer exam_id);
     void saveAnswerAndScore(String answer, Integer score, Integer question_id, Integer exam_id, Integer user_id);
     Exam getExamByExamId(Integer exam_id);
+    Boolean isExamDoneOverOne(Integer exam_id);
+    void saveIsCommit(Integer is_commit, Integer question_id, Integer exam_id, Integer user_id);
 }

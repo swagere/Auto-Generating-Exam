@@ -194,5 +194,25 @@ public class ExamServiceImpl implements ExamService {
     public Exam getExamByExamId(Integer exam_id) {
         return examRepository.getExamByExamId(exam_id);
     }
+
+    //判断考试是否结束超过一分钟(前提：考试已结束)
+    @Override
+    public Boolean isExamDoneOverOne(Integer exam_id) {
+        //判断考试是否结束超过一分钟
+        Long exam_time = examRepository.getBeginTimeByExamId(exam_id);
+        Long last_time = examRepository.getLastTimeByExamId(exam_id);
+        Long now_time = System.currentTimeMillis();
+
+        if (now_time - exam_time - last_time > 60 * 1000) {
+            return true;
+        }
+        return false;
+    }
+
+    //存储是否交卷字段
+    @Override
+    public void saveIsCommit(Integer is_commit, Integer question_id, Integer exam_id, Integer user_id) {
+
+    }
 }
 
