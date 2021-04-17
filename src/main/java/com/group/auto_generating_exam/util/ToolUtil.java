@@ -1,5 +1,6 @@
 package com.group.auto_generating_exam.util;
 
+import com.group.auto_generating_exam.model.Question;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 
 import java.util.ArrayList;
@@ -37,5 +38,20 @@ public class ToolUtil {
             //这里处理异常
         }
         return list;
+    }
+
+    //string转Question.Type
+    public static Question.QuestionType String2QuestionType(String s) {
+        switch (s) {
+            case "Single":
+                return Question.QuestionType.Single;
+            case "Discussion":
+                return Question.QuestionType.Discussion;
+            case "Judge":
+                return Question.QuestionType.Judge;
+            case "Normal_Program":
+                return Question.QuestionType.Normal_Program;
+        }
+        return Question.QuestionType.SpecialJudge_Program;
     }
 }

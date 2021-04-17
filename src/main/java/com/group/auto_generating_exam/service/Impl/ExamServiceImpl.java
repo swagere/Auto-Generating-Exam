@@ -140,14 +140,10 @@ public class ExamServiceImpl implements ExamService {
         return examRepository.getProgressStatusByExamId(exam_id);
     }
 
-    //判断是否已经获取试卷（user_exam_question）
+    //查询学生已获取试卷的题号列表（user_exam_question）
     @Override
-    public Boolean isGetStuExamQuestion(Integer exam_id, Integer user_id) {
-        List<UserExamQuestion> questions = userExamQuestionRepository.getUserExamQuestion(exam_id, user_id);
-        if (questions.isEmpty()) {
-            return false;
-        }
-        return true;
+    public List<Integer> getStuExamQuestionIds(Integer exam_id, Integer user_id) {
+        return userExamQuestionRepository.getUserExamQuestionIds(exam_id, user_id);
     }
 
     //根据exam_id获取sub_id
@@ -185,6 +181,12 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Long getLastTime(Integer exam_id) {
         return examRepository.getLastTimeByExamId(exam_id);
+    }
+
+    //存储学生答案
+    @Override
+    public void saveAnswerAndScore(String answer, Integer score, Integer question_id, Integer exam_id, Integer user_id) {
+        userExamQuestionRepository.saveAnswerAndScore(answer, score, question_id, exam_id, user_id);
     }
 }
 

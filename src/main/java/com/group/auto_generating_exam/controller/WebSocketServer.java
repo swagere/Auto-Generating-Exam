@@ -1,16 +1,22 @@
 package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.group.auto_generating_exam.model.Exam;
+import com.group.auto_generating_exam.model.Question;
+import com.group.auto_generating_exam.model.UserExamQuestion;
 import com.group.auto_generating_exam.service.ExamService;
+import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -104,7 +110,7 @@ public class WebSocketServer {
      * @param session
      */
     @OnMessage
-    public void startExam(String message, Session session) throws IOException {
+    public void OnMessage(String message, Session session) throws IOException {
         //检验学生身份
 
         Integer type = Integer.valueOf(JSON.parseObject(message).get("type").toString());
@@ -152,8 +158,8 @@ public class WebSocketServer {
 
 
             //检测是否已经分发给他试卷 若没有分发试卷则判定无法开始考试
-            Boolean isGetExamQuestion = examService.isGetStuExamQuestion(exam_id, user_id);
-            if (!isGetExamQuestion) {
+            List<Integer> questionIds = examService.getStuExamQuestionIds(exam_id, user_id);
+            if (questionIds.isEmpty()) {
                 result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
                 result.put("message","该学生还未得到试卷");
             }
@@ -171,6 +177,83 @@ public class WebSocketServer {
             Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
             result.put("type","10001"); //type为10000表考试开始时返回，10002为请求失败
             result.put("message", rest_time);
+
+            sendMessage(session, result);
+        }
+        else if (type == 99999) {
+            //如果是保存学生答题结果
+
+            //用户是否选择这门课程 即用户是否能参与这个考试
+            Boolean isStuInExam = examService.isStuInExam(exam_id, user_id);
+            if (!isStuInExam) {
+                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
+                result.put("message","用户没有选择该课程，不能参与考试");
+            }
+            //考试是否存在
+            if (!examService.isExamExist(exam_id)) {
+                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
+                result.put("message","用户没有选择该课程，该考试不存在");
+            }
+            //检测是否超过考试时间/还未开始考试 若超过考试时间则不能考试
+            Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
+            if (progress_status.equals(Exam.ProgressStatus.WILL)) {
+                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
+                result.put("message","该考试还未开始");
+            }
+            if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
+                result.put("message","该考试已结束");
+            }
+
+
+            //检测是否已经分发给他试卷 若没有分发试卷则判定无法开始考试
+            List<Integer> questionIds = examService.getStuExamQuestionIds(exam_id, user_id);
+            if (questionIds.isEmpty()) {
+                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
+                result.put("message","该学生还未得到试卷");
+            }
+
+
+            //检测是否已经交卷 若已交卷则不能考试
+            if (examService.isCommit(exam_id, user_id)) {
+                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
+                result.put("message","用户已交卷");
+            }
+
+            //将传过来的数据存入user_exam_question表中
+            Question.QuestionType questionType = ToolUtil.String2QuestionType(JSON.parseObject(message).get("type").toString());
+            List questions = ToolUtil.String2List(JSON.parseObject(message).get("data").toString());
+
+            Integer error = 0;
+            for (Object q : questions) {
+                Map question = JSONObject.parseObject(JSONObject.toJSONString(q), Map.class);
+                Integer question_id = Integer.valueOf(String.valueOf(question.get("question_id")));
+                String answer = String.valueOf(question.get("answer"));
+
+                Integer score = 0;
+                if (question.get("score") != null) {
+                    score = Integer.valueOf(String.valueOf(question.get("score")));
+                }
+
+
+                //如果该考生没有该题则报错
+                if (!questionIds.contains(question_id)) {
+                    result.put("message" + error, "该学生未分配到第" + question_id + "考题，此题未成功存储");
+                    error++;
+                }
+                else {
+                    //保存到数据库中
+                    examService.saveAnswerAndScore(answer, score, question_id, exam_id, user_id);
+                }
+
+            }
+            if (error != 0) {
+                result.put("type","60002");
+            }
+            else {
+                result.put("type","60001");
+                result.put("message", "保存答题结果成功");
+            }
 
             sendMessage(session, result);
         }

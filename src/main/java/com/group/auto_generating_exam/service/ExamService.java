@@ -1,7 +1,9 @@
 package com.group.auto_generating_exam.service;
 
 import com.group.auto_generating_exam.model.Exam;
+import com.group.auto_generating_exam.model.UserExamQuestion;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,10 +18,11 @@ public interface ExamService {
     Boolean isStuInExam(Integer exam_id, Integer user_id);
     Boolean isCommit(Integer exam_id, Integer user_id);
     Exam.ProgressStatus getExamProgressStatus(Integer Exam);
-    Boolean isGetStuExamQuestion(Integer exam_id, Integer user_id);
+    List<Integer> getStuExamQuestionIds(Integer exam_id, Integer user_id);
     String getSubIdByExamId(Integer exam_id);
     void saveLastTime(Long last_time, Integer exam_id);
     void endExam(Integer exam_id);
     Long getRestTimeByExamId(Integer exam_id, Long last_time);
     Long getLastTime(Integer exam_id);
+    void saveAnswerAndScore(String answer, Integer score, Integer question_id, Integer exam_id, Integer user_id);
 }
