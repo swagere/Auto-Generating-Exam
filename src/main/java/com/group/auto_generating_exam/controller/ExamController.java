@@ -12,6 +12,7 @@ import com.group.auto_generating_exam.model.JudgeResult;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.JudgeService;
 import com.group.auto_generating_exam.service.SubjectService;
+import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -96,7 +97,7 @@ public class ExamController {
      * @return
      */
     @RequestMapping("/getExam")
-    public @ResponseBody AjaxResponse getExam() {
+    public @ResponseBody AjaxResponse generateExam() {
         BasicGene.IntelligentTestSystem intelligentTestSystem = new BasicGene.IntelligentTestSystem();
         intelligentTestSystem.Initial();
 
@@ -220,5 +221,24 @@ public class ExamController {
         log.info("判题成功");
         JudgeResult judgeResult = judgeService.transformToResult(json, user_id, getProgram.getCode(), getProgram.getLanguage(), getProgram.getQuestion_id(), getProgram.getExam_id());
         return AjaxResponse.success(judgeResult);
+    }
+
+    /**
+     * 老师获取考试信息
+     */
+    @PostMapping("/getExam")
+    public @ResponseBody AjaxResponse getExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
+
+        Exam exam = examService.getExamByExamId(exam_id);
+        if (exam == null) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"没有该试卷信息"));
+        }
+
+        Map result = JSONObject.parseObject(JSONObject.toJSONString(exam), Map.class);
+        result.put("sub_name", subjectService.getSubNameBySubId(exam.getSub_id()));
+
+
+        return AjaxResponse.success(result);
     }
 }

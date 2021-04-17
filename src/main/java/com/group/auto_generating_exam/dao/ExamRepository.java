@@ -34,4 +34,6 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
     @Query("update Exam u set u.progress_status = :status where u.exam_id = :exam_id")
     void updateProgressStatus(@Param("exam_id") Integer exam_id, @Param("progress_status") Exam.ProgressStatus status);
 
+    @Query("select u from Exam u where u.exam_id = ?1")
+    Exam getExamByExamId(Integer exam_id);
 }

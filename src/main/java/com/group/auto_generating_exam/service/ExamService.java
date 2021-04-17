@@ -25,4 +25,5 @@ public interface ExamService {
     Long getRestTimeByExamId(Integer exam_id, Long last_time);
     Long getLastTime(Integer exam_id);
     void saveAnswerAndScore(String answer, Integer score, Integer question_id, Integer exam_id, Integer user_id);
+    Exam getExamByExamId(Integer exam_id);
 }

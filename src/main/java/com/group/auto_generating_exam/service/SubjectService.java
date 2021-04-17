@@ -10,4 +10,5 @@ import java.util.Map;
 public interface SubjectService {
     Boolean isStuInSub(String sub_id, Integer user_id);
     Integer getUserIdBySubId(String sub_id);
+    String getSubNameBySubId(String sub_id);
 }

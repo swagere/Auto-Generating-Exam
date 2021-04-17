@@ -45,5 +45,10 @@ public class SubjectServiceImpl implements SubjectService {
     public Integer getUserIdBySubId(String sub_id) {
         return subjectRepository.getUserIdBySubId(sub_id);
     }
+
+    @Override
+    public String getSubNameBySubId(String sub_id) {
+        return subjectRepository.getSubNameBySubId(sub_id);
+    }
 }
 

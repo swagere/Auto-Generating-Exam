@@ -12,4 +12,7 @@ public interface SubjectRepository extends JpaRepository<Subject, String> {
 
     @Query("select s.user_id from Subject s where s.sub_id = ?1")
     Integer getUserIdBySubId(String sub_id);
+
+    @Query("select s.sub_name from Subject s where s.sub_id = ?1")
+    String getSubNameBySubId(String sub_id);
 }

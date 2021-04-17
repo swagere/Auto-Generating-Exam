@@ -188,5 +188,11 @@ public class ExamServiceImpl implements ExamService {
     public void saveAnswerAndScore(String answer, Integer score, Integer question_id, Integer exam_id, Integer user_id) {
         userExamQuestionRepository.saveAnswerAndScore(answer, score, question_id, exam_id, user_id);
     }
+
+    //返回考试信息
+    @Override
+    public Exam getExamByExamId(Integer exam_id) {
+        return examRepository.getExamByExamId(exam_id);
+    }
 }
 
