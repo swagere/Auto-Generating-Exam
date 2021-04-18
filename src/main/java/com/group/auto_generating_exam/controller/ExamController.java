@@ -6,9 +6,7 @@ import com.group.auto_generating_exam.config.gene.BasicGene;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
-import com.group.auto_generating_exam.model.Exam;
-import com.group.auto_generating_exam.model.GetProgram;
-import com.group.auto_generating_exam.model.JudgeResult;
+import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.JudgeService;
 import com.group.auto_generating_exam.service.SubjectService;
@@ -250,8 +248,7 @@ public class ExamController {
     }
 
     /**
-     * 连接关闭调用的方法
-     * 交卷
+     * 学生交卷
      */
     @PostMapping("/handInExam")
     public @ResponseBody AjaxResponse handInExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
@@ -308,5 +305,34 @@ public class ExamController {
         }
 
         return AjaxResponse.success();
+    }
+
+    /**
+     * 老师添加试卷/修改试卷
+     */
+    @PostMapping("/saveExam")
+    public @ResponseBody AjaxResponse addExam(@RequestBody GetExam getExam, HttpServletRequest httpServletRequest) {
+
+        //该课程是否存在
+        String sub_id = getExam.getSub_id();
+        Integer user_id = subjectService.getUserIdBySubId(sub_id);
+        if (user_id == null) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该课程不存在"));
+        }
+
+        //老师是否能创建这个课程的考试
+        if (!user_id.equals(getExam.getUser_id())) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该老师无权创建该课程的考试"));
+        }
+
+        //存入数据库
+        Exam exam = new Exam();
+        exam.setExam_name(getExam.getExam_name());
+        exam.setBegin_time(getExam.getBegin_time());
+        exam.setLast_time(getExam.getLast_time());
+        exam.setSub_id(sub_id);
+        Integer exam_id = examService.saveExam(exam);
+
+        return AjaxResponse.success(exam_id);
     }
 }

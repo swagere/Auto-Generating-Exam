@@ -23,7 +23,7 @@ public class Exam implements Serializable {
 
     @Id
     @Column
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+//    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer exam_id;
 
     @Column

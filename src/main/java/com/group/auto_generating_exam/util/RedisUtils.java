@@ -15,13 +15,13 @@ public class RedisUtils {
         this.redisTemplate = redisTemplate;
     }
 
-    public Long incr(String key) {
+    public Integer incr(String key) {
         RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
         Long increment = entityIdCounter.getAndIncrement();
-        return increment;
+        return increment.intValue();
     }
 
-    public void set(String key, Long exam_id){
+    public void set(String key, Integer exam_id){
         RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
         entityIdCounter.set(exam_id);
     }

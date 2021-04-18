@@ -4,6 +4,7 @@ import com.group.auto_generating_exam.dao.*;
 import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.SubjectService;
+import com.group.auto_generating_exam.util.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,8 @@ public class ExamServiceImpl implements ExamService {
     SubjectService subjectService;
     @Autowired
     TestCaseRepository testCaseRepository;
+    @Autowired
+    RedisUtils redisUtils;
 
     //获取试卷列表（学生开始答题）
     @Override
@@ -213,6 +216,33 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public void saveIsCommit(Integer is_commit, Integer question_id, Integer exam_id, Integer user_id) {
         userExamQuestionRepository.saveIsCommit(is_commit, question_id, exam_id, user_id);
+    }
+
+    //修改/新增考试
+    @Override
+    public Integer saveExam(Exam exam) {
+        //编辑试卷信息
+        if (exam.getExam_id() != null) {
+            //如果exam_id为空
+            exam.setProgress_status(Exam.ProgressStatus.WILL);
+            examRepository.save(exam);
+            return exam.getExam_id();
+        } else {
+            //如果exam_id不为空
+
+            Integer exam_id = redisUtils.incr("exam_id");
+            //判断redis的exam_id值是否为目前数据库最大
+            Integer max = examRepository.getMaxExamId();
+            if (max != null && max >= exam_id) {
+                exam_id = max + 1;
+                redisUtils.set("exam_id", max + 1);
+            }
+            exam.setProgress_status(Exam.ProgressStatus.WILL);
+            System.out.println(exam_id);
+            exam.setExam_id(exam_id);
+            examRepository.save(exam);
+            return exam_id;
+        }
     }
 }
 

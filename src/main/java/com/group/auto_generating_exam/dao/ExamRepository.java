@@ -36,4 +36,7 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
 
     @Query("select u from Exam u where u.exam_id = ?1")
     Exam getExamByExamId(Integer exam_id);
+
+    @Query("select max(u.exam_id) from Exam u")
+    Integer getMaxExamId();
 }
