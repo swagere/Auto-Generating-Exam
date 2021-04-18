@@ -133,16 +133,16 @@ public class WebSocketServer {
         else if (type == 9999) {
             //--如果是开始考试------------------------------
 
+            //考试是否存在
+            if (!examService.isExamExist(exam_id)) {
+                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
+                result.put("message","该考试不存在");
+            }
             //用户是否选择这门课程 即用户是否能参与这个考试
             Boolean isStuInExam = examService.isStuInExam(exam_id, user_id);
             if (!isStuInExam) {
                 result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
                 result.put("message","用户没有选择该课程，不能参与考试");
-            }
-            //考试是否存在
-            if (!examService.isExamExist(exam_id)) {
-                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-                result.put("message","用户没有选择该课程，该考试不存在");
             }
             //检测是否超过考试时间/还未开始考试 若超过考试时间则不能考试
             Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
@@ -182,16 +182,16 @@ public class WebSocketServer {
         else if (type == 99999) {
             //如果是保存学生答题结果
 
+            //考试是否存在
+            if (!examService.isExamExist(exam_id)) {
+                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
+                result.put("message","该考试不存在");
+            }
             //用户是否选择这门课程 即用户是否能参与这个考试
             Boolean isStuInExam = examService.isStuInExam(exam_id, user_id);
             if (!isStuInExam) {
                 result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
                 result.put("message","用户没有选择该课程，不能参与考试");
-            }
-            //考试是否存在
-            if (!examService.isExamExist(exam_id)) {
-                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-                result.put("message","用户没有选择该课程，该考试不存在");
             }
             //检测是否超过考试时间/还未开始考试 若超过考试时间则不能考试
             Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
@@ -294,75 +294,5 @@ public class WebSocketServer {
      */
     public static void socketFinishExam(Integer exam_id) throws IOException {
     }
-
-
-    /**
-     * 连接关闭调用的方法
-     * 交卷
-     */
-//    @OnClose
-//    public void onClose(String message, Session session) throws IOException {
-//        SessionSet.remove(session);
-//        int cnt = OnlineCount.decrementAndGet();
-//        log.info("有连接关闭，当前连接数为：{}", cnt);
-//
-//        //停止该考生的考试：查找出该考生的所有考题 并设置is_commit字段
-//
-//        Integer exam_id = Integer.valueOf(JSON.parseObject(message).get("exam_id").toString());
-//        Integer user_id = Integer.valueOf(JSON.parseObject(message).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
-//
-//        Map result = new HashMap();
-//
-//
-//        //用户是否选择这门课程 即用户是否能参与这个考试
-//        Boolean isStuInExam = examService.isStuInExam(exam_id, user_id);
-//        if (!isStuInExam) {
-//            result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-//            result.put("message","用户没有选择该课程，不能参与考试");
-//        }
-//        //考试是否存在
-//        if (!examService.isExamExist(exam_id)) {
-//            result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-//            result.put("message","用户没有选择该课程，该考试不存在");
-//        }
-//        //检测是否超过考试时间(//判断是否为该考试结束一分钟之后交试卷)/还未开始考试 若超过考试时间则不能考试
-//        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
-//        if (progress_status.equals(Exam.ProgressStatus.WILL)) {
-//            result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-//            result.put("message","该考试还未开始");
-//        }
-//        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
-//            //判断是否为该考试结束一分钟之后交卷
-//            if (examService.isExamDoneOverOne(exam_id)) {
-//                result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-//                result.put("message","该考试已结束，不能再提交试卷");
-//            }
-//        }
-//
-//
-//        //检测是否已经分发给他试卷 若没有分发试卷则判定无法交卷
-//        List<Integer> questionIds = examService.getStuExamQuestionIds(exam_id, user_id);
-//        if (questionIds.isEmpty()) {
-//            result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-//            result.put("message","该学生还未得到试卷");
-//        }
-//
-//
-//        //检测是否已经交卷 若已交卷则不能再次交卷
-//        if (examService.isCommit(exam_id, user_id)) {
-//            result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-//            result.put("message","用户已交卷");
-//        }
-//
-//        //可以停止该考生考试
-//        for (Integer question_id : questionIds) {
-//            examService.saveIsCommit(1, question_id, exam_id, user_id);
-//        }
-//
-//        Map results = new HashMap();
-//        results.put("type", "70001");
-//        results.put("message", 0);
-//        sendMessage(session, results);
-//    }
 
 } 

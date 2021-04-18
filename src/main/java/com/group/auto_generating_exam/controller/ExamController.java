@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,16 +55,17 @@ public class ExamController {
         Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
         Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
 
+        //考试是否存在
+        if (!examService.isExamExist(exam_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试不存在"));
+        }
+
         //用户是否选择这门课程 即用户是否能参与这个考试
         Boolean isStuInExam = examService.isStuInExam(exam_id, user_id);
         if (!isStuInExam) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"用户没有选择该课程，不能参与考试"));
         }
 
-        //考试是否存在
-        if (!examService.isExamExist(exam_id)) {
-            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试不存在"));
-        }
 
         //考试是否正在进行
 //        String examIsProgressing = examService.examIsProgressing(exam_id);
@@ -122,6 +124,11 @@ public class ExamController {
         Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
 
         //判断是否是老师
+
+        //考试是否存在
+        if (!examService.isExamExist(exam_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试不存在"));
+        }
 
         //判断该老师是否是该考试发起者
         String sub_id = examService.getSubIdByExamId(exam_id);
@@ -240,5 +247,66 @@ public class ExamController {
 
 
         return AjaxResponse.success(result);
+    }
+
+    /**
+     * 连接关闭调用的方法
+     * 交卷
+     */
+    @PostMapping("/handInExam")
+    public @ResponseBody AjaxResponse handInExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        //停止该考生的考试：查找出该考生的所有考题 并设置is_commit字段
+
+        Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
+        Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
+
+
+        //考试是否存在
+        if (!examService.isExamExist(exam_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试不存在"));
+//            result.put("message","用户没有选择该课程，该考试不存在");
+        }
+        //用户是否选择这门课程 即用户是否能参与这个考试
+        Boolean isStuInExam = examService.isStuInExam(exam_id, user_id);
+        if (!isStuInExam) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"用户没有选择该课程，不能参与考试"));
+//            result.put("message","用户没有选择该课程，不能参与考试");
+        }
+        //检测是否超过考试时间(//判断是否为该考试结束一分钟之后交试卷)/还未开始考试 若超过考试时间则不能考试
+        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
+        if (progress_status.equals(Exam.ProgressStatus.WILL)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始"));
+//            result.put("message","该考试还未开始");
+        }
+        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+            //判断是否为该考试结束一分钟之后交卷
+            if (examService.isExamDoneOverOne(exam_id)) {
+                return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束，不能再提交试卷"));
+//                result.put("message","该考试已结束，不能再提交试卷");
+            }
+        }
+
+
+        //检测是否已经分发给他试卷 若没有分发试卷则判定无法交卷
+        List<Integer> questionIds = examService.getStuExamQuestionIds(exam_id, user_id);
+        if (questionIds.isEmpty()) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该学生还未得到试卷"));
+//            result.put("message","该学生还未得到试卷");
+        }
+
+
+        //检测是否已经交卷 若已交卷则不能再次交卷
+        if (examService.isCommit(exam_id, user_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"用户已交卷"));
+//            result.put("message","用户已交卷");
+        }
+
+        //可以停止该考生考试
+        for (Integer question_id : questionIds) {
+            System.out.println(question_id);
+            examService.saveIsCommit(1, question_id, exam_id, user_id);
+        }
+
+        return AjaxResponse.success();
     }
 }

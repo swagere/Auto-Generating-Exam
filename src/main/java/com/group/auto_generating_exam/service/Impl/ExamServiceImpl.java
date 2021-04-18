@@ -212,7 +212,7 @@ public class ExamServiceImpl implements ExamService {
     //存储是否交卷字段
     @Override
     public void saveIsCommit(Integer is_commit, Integer question_id, Integer exam_id, Integer user_id) {
-
+        userExamQuestionRepository.saveIsCommit(is_commit, question_id, exam_id, user_id);
     }
 }
 
