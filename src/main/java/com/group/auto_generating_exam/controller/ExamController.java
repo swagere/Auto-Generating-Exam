@@ -311,7 +311,7 @@ public class ExamController {
      * 老师添加试卷/修改试卷
      */
     @PostMapping("/saveExam")
-    public @ResponseBody AjaxResponse addExam(@RequestBody GetExam getExam, HttpServletRequest httpServletRequest) {
+    public @ResponseBody AjaxResponse saveExam(@RequestBody GetExam getExam, HttpServletRequest httpServletRequest) {
 
         //该课程是否存在
         String sub_id = getExam.getSub_id();
@@ -335,4 +335,13 @@ public class ExamController {
 
         return AjaxResponse.success(exam_id);
     }
+
+    /**
+     * 老师添加试卷/修改试题
+     */
+//    @PostMapping("/saveQuestionToExam")
+//        public @ResponseBody AjaxResponse saveQuestionToExam(@RequestBody GetQuestion getQuestion, HttpServletRequest httpServletRequest) {
+//
+//    }
+
 }

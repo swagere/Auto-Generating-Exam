@@ -5,6 +5,7 @@ import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.SubjectService;
 import com.group.auto_generating_exam.util.RedisUtils;
+import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,8 +77,8 @@ public class ExamServiceImpl implements ExamService {
                     TestCase testCase = testCaseRepository.getTestCaseByQuestionId(question_id);
                     String input = testCase.getInput();
                     String output = testCase.getOutput();
-                    getQuestion.setInput(input);
-                    getQuestion.setOutput(output);
+                    getQuestion.setInput(ToolUtil.String2List(input).get(0));
+                    getQuestion.setOutput(ToolUtil.String2List(output).get(0));
                     programList.add(getQuestion);
                 }
             }
