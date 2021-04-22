@@ -1,10 +1,7 @@
 package com.group.auto_generating_exam.service.Impl;
 
 import com.group.auto_generating_exam.dao.*;
-import com.group.auto_generating_exam.model.GetExamQuestion;
-import com.group.auto_generating_exam.model.Question;
-import com.group.auto_generating_exam.model.UserExamQuestion;
-import com.group.auto_generating_exam.model.UserSubject;
+import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.SubjectService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,14 +38,21 @@ public class SubjectServiceImpl implements SubjectService {
         return false;
     }
 
+    //根据sub_id获取老师id
     @Override
     public Integer getUserIdBySubId(String sub_id) {
         return subjectRepository.getUserIdBySubId(sub_id);
     }
 
+    //根据sub_id获取课程名
     @Override
     public String getSubNameBySubId(String sub_id) {
         return subjectRepository.getSubNameBySubId(sub_id);
+    }
+
+    @Override
+    public List<Subject> getSubjectByUserId(Integer user_id) {
+        return subjectRepository.getSubjectByUserId(user_id);
     }
 }
 

@@ -351,7 +351,7 @@ public class ExamController {
 //    }
 
     /**
-     * 获取一个老师的某个科目和科目下的所有试卷
+     * 获取一个老师的某个科目下的所有试卷
      * @param str
      * @param httpServletRequest
      * @return
