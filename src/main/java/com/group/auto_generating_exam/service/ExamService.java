@@ -26,8 +26,11 @@ public interface ExamService {
     Long getLastTime(Integer exam_id);
     void saveAnswerAndScore(String answer, Integer score, Integer question_id, Integer exam_id, Integer user_id);
     Exam getExamByExamId(Integer exam_id);
+    List<Exam> getExamsByExamId(List<Integer> exam_ids);
     Boolean isExamDoneOverOne(Integer exam_id);
     void saveIsCommit(Integer is_commit, Integer question_id, Integer exam_id, Integer user_id);
     Integer saveExam(Exam exam);
     List<Exam> getExamBySubId(String sub_id);
+    List<Integer> getExamIdsByUserId(Integer user_id);
+    Integer getExamScore(Integer exam_id, Integer user_id);
 }

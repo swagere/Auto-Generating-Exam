@@ -199,6 +199,12 @@ public class ExamServiceImpl implements ExamService {
         return examRepository.getExamByExamId(exam_id);
     }
 
+    //返回考试信息
+    @Override
+    public List<Exam> getExamsByExamId(List<Integer> exam_ids) {
+        return examRepository.getExamsByExamId(exam_ids);
+    }
+
     //判断考试是否结束超过一分钟(前提：考试已结束)
     @Override
     public Boolean isExamDoneOverOne(Integer exam_id) {
@@ -250,6 +256,25 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public List<Exam> getExamBySubId(String sub_id) {
         return examRepository.getExamBySubId(sub_id);
+    }
+
+    //获取一个学生的所有考试
+    @Override
+    public List<Integer> getExamIdsByUserId(Integer user_id) {
+        return userExamQuestionRepository.getExamIdsByUserId(user_id);
+    }
+
+    //获得一个考试的成绩
+    @Override
+    public Integer getExamScore(Integer exam_id, Integer user_id) {
+        List<Integer> scores = userExamQuestionRepository.getScoresByExamIdAndUserId(exam_id, user_id);
+        int total = 0;
+        for (Integer score : scores) {
+            if (score != null) {
+                total += score;
+            }
+        }
+        return total;
     }
 }
 

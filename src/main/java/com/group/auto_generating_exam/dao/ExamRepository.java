@@ -45,4 +45,7 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
 
     @Query("select u from Exam u where u.sub_id = ?1")
     List<Exam> getExamBySubId(String sub_id);
+
+    @Query("select u from Exam u where u.exam_id in (:exam_ids) order by u.begin_time desc ")
+    List<Exam> getExamsByExamId(List<Integer> exam_ids);
 }

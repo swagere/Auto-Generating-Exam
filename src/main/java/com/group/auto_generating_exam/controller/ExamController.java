@@ -351,7 +351,7 @@ public class ExamController {
 //    }
 
     /**
-     * 获取一个老师的某个科目下的所有试卷
+     * 获取一个老师的某个科目和科目下的所有试卷
      * @param str
      * @param httpServletRequest
      * @return
@@ -404,8 +404,58 @@ public class ExamController {
         return AjaxResponse.success(exams);
     }
 
+    /**
+     * 获取一个学生的所有试卷
+     * @param str
+     * @param httpServletRequest
+     * @return
+     * status 0 未开始
+     * status 1 正在进行
+     * status 2 未评分
+     * status 3 已评分
+     */
     @PostMapping("/getStuAllExam")
     public @ResponseBody AjaxResponse getStuAllExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
-        return AjaxResponse.success();
+        Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString());
+
+        List<Integer> exam_ids = examService.getExamIdsByUserId(user_id);
+        if (exam_ids.isEmpty()) {
+            return AjaxResponse.success();
+        }
+        List<Exam> exams_origin = examService.getExamsByExamId(exam_ids);
+
+        List<Map<String, Object>> ret = new ArrayList<>();
+
+        for (Exam exam_origin : exams_origin) {
+            Map exam = new HashMap();
+            exam.put("exam_id", exam_origin.getExam_id());
+            exam.put("exam_name", exam_origin.getExam_name());
+            exam.put("begin_time", exam_origin.getBegin_time());
+            exam.put("last_time", exam_origin.getLast_time() / 1000 / 60);
+            exam.put("co_name", subjectService.getSubNameBySubId(exam_origin.getSub_id()));
+            exam.put("tea_name", userService.getUserNameByUserId(user_id));
+
+            //exam_status
+            Exam.ProgressStatus progressStatus = exam_origin.getProgress_status();
+            if (progressStatus.equals(Exam.ProgressStatus.WILL)) {
+                exam.put("exam_status", 0);
+            }
+            else if (progressStatus.equals(Exam.ProgressStatus.ING)) {
+                exam.put("exam_status", 1);
+            }
+            else if (progressStatus.equals(Exam.ProgressStatus.DONE) && exam_origin.getIs_judge().equals(0)) {
+                exam.put("exam_status", 2);
+            }
+            else if (progressStatus.equals(Exam.ProgressStatus.DONE) && exam_origin.getIs_judge().equals(1)) {
+                exam.put("exam_status", 3);
+
+                //已评分 返回分数
+                exam.put("score", examService.getExamScore(exam_origin.getExam_id(), user_id));
+            }
+
+            ret.add(exam);
+        }
+
+        return AjaxResponse.success(ret);
     }
 }
