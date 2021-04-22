@@ -29,4 +29,5 @@ public interface ExamService {
     Boolean isExamDoneOverOne(Integer exam_id);
     void saveIsCommit(Integer is_commit, Integer question_id, Integer exam_id, Integer user_id);
     Integer saveExam(Exam exam);
+    List<Exam> getExamBySubId(String sub_id);
 }

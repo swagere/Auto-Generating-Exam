@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
 
+
+import java.util.List;
+
 public interface ExamRepository extends JpaRepository<Exam, Integer> {
     @Query("select s.begin_time from Exam s where s.exam_id = ?1")
     Long getBeginTimeByExamId(Integer exam_id);
@@ -39,4 +42,7 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
 
     @Query("select max(u.exam_id) from Exam u")
     Integer getMaxExamId();
+
+    @Query("select u from Exam u where u.sub_id = ?1")
+    List<Exam> getExamBySubId(String sub_id);
 }

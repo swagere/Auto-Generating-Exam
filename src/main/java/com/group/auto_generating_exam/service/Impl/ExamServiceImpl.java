@@ -245,5 +245,11 @@ public class ExamServiceImpl implements ExamService {
             return exam_id;
         }
     }
+
+    //根据sub_id获得所有考试
+    @Override
+    public List<Exam> getExamBySubId(String sub_id) {
+        return examRepository.getExamBySubId(sub_id);
+    }
 }
 
