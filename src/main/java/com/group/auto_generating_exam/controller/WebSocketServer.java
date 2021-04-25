@@ -4,13 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.group.auto_generating_exam.model.Exam;
 import com.group.auto_generating_exam.model.Question;
-import com.group.auto_generating_exam.model.UserExamQuestion;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import springfox.documentation.spring.web.json.Json;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -31,8 +29,8 @@ public class WebSocketServer {
     // concurrent包的线程安全Set，用来存放每个客户端对应的Session对象。  
     private static CopyOnWriteArraySet<Session> SessionSet = new CopyOnWriteArraySet<>();
 
-    @Autowired
-    ExamService examService;
+    public static ExamService examService;
+
 
 
 
@@ -118,13 +116,18 @@ public class WebSocketServer {
 
         Map result = new HashMap();
 
-
         if (type == 999) {
             //--如果是请求考试剩余时间---------------------
 
             //返回前端
             Long last_time = examService.getLastTime(exam_id);
+            log.info("last_time");
+            log.info(String.valueOf(last_time));
+
             Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
+            log.info("rest_time");
+            log.info(String.valueOf(rest_time));
+
             result.put("type","100"); //type为10000表考试开始时返回，10002为请求失败
             result.put("message", rest_time);
 
@@ -253,6 +256,7 @@ public class WebSocketServer {
                 result.put("type","60001");
                 result.put("message", "保存答题结果成功");
             }
+
 
             sendMessage(session, result);
         }
