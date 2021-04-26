@@ -121,15 +121,10 @@ public class WebSocketServer {
 
             //返回前端
             Long last_time = examService.getLastTime(exam_id);
-            log.info("last_time");
-            log.info(String.valueOf(last_time));
-
             Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
-            log.info("rest_time");
-            log.info(String.valueOf(rest_time));
 
             result.put("type","100"); //type为10000表考试开始时返回，10002为请求失败
-            result.put("message", rest_time);
+            result.put("message", rest_time/1000); //以秒为单位
 
             sendMessage(session, result);
         }
