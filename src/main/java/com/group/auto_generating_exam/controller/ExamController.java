@@ -379,6 +379,7 @@ public class ExamController {
         List exams = new ArrayList();
         for (Exam exam_origin : exams_origin) {
             Map exam = new HashMap();
+            exam.put("exam_id", exam_origin.getExam_id());
             exam.put("exam_name", exam_origin.getExam_name());
             exam.put("begin_time", exam_origin.getBegin_time());
             exam.put("last_time", exam_origin.getLast_time() / 1000 / 60);
