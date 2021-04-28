@@ -553,4 +553,27 @@ public class ExamController {
         examService.saveIsJudge(exam_id, 1);
         return AjaxResponse.success();
     }
+
+    /**
+     * 教师判题提交分数
+     * @param req
+     * @return
+     */
+    @PostMapping("/handInScore")
+    public @ResponseBody AjaxResponse handInScore(@RequestBody GetHandInScore req, HttpServletRequest httpServletRequest) {
+//        authorityCheckService.checkTeacherAuthority(httpServletRequest.getSession().getAttribute("userInfo"));
+        try {
+            Integer stu_id = req.getStu_id();
+            Integer exam_id = req.getExam_id();
+            for (UserExamQuestion stuExam: req.getScoreList()) {
+                examService.saveUserExamQuestionScore(stuExam.getScore(), stuExam.getQuestion_id(), exam_id, stu_id);
+            }
+
+            examService.saveUserExamQuestionIsJudge(exam_id, 1);
+            return AjaxResponse.success();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return AjaxResponse.error(new CustomException(CustomExceptionType.SYSTEM_ERROR, e.getMessage()));
+        }
+    }
 }

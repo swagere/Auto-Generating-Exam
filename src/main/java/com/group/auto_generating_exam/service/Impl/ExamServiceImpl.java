@@ -304,5 +304,17 @@ public class ExamServiceImpl implements ExamService {
     public void saveIsJudge(Integer exam_id, int flag) {
         examRepository.saveIsJudge(exam_id, flag);
     }
+
+    //保存老师评分
+    @Override
+    public void saveUserExamQuestionScore(int score, int question_id, int exam_id, int user_id){
+        userExamQuestionRepository.saveScore(score, question_id, exam_id, user_id);
+    }
+
+    //老师一个人的完成评分
+    @Override
+    public void saveUserExamQuestionIsJudge(Integer exam_id, int flag) {
+        userExamQuestionRepository.saveIsJudge(exam_id, flag);
+    }
 }
 

@@ -52,4 +52,5 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
     @Modifying
     @Transactional
     @Query("update Exam u set u.is_judge = :is_judge where u.exam_id = :exam_id")
-    void saveIsJudge(@Param("exam_id") Integer exam_id, @Param("is_judge") int is_judge);}
+    void saveIsJudge(@Param("exam_id") Integer exam_id, @Param("is_judge") int is_judge);
+}

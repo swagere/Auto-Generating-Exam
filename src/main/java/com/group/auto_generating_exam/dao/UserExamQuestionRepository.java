@@ -48,4 +48,9 @@ public interface UserExamQuestionRepository extends JpaRepository<UserExamQuesti
 
     @Query("select u.score from UserExamQuestion u where u.exam_id = ?1 and u.user_id = ?2")
     List<Integer> getScoresByExamIdAndUserId(Integer exam_id, Integer user_id);
+
+    @Modifying
+    @Transactional
+    @Query("update UserExamQuestion u set u.is_judge = :is_judge where u.exam_id = :exam_id")
+    void saveIsJudge(@Param("exam_id") Integer exam_id, @Param("is_judge") int is_judge);
 }
