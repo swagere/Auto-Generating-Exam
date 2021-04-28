@@ -25,7 +25,6 @@ public class Question implements Serializable {
 
     @Id
     @Column
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer question_id;
 
     @Column

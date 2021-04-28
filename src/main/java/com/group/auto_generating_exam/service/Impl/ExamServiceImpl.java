@@ -9,6 +9,7 @@ import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -23,6 +24,7 @@ import java.util.Map;
  */
 
 @Slf4j
+@EnableAsync
 @Service
 public class ExamServiceImpl implements ExamService {
     @Autowired

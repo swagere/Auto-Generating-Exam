@@ -534,10 +534,8 @@ public class ExamController {
 
         examService.saveQuestion(getQuestion);  //保存到question表
 
-        log.info("题目 添加/更新 成功");
         if (getQuestion.getQuestion_type() == (GetQuestion.Type.Normal_Program) || getQuestion.getQuestion_type() == (GetQuestion.Type.SpecialJudge_Program)) {
             judgeService.addTestCase(getQuestion);   //保存到test_case表
-            log.info("添加/更新 测试用例成功");
         }
         return AjaxResponse.success(question_id);
     }
