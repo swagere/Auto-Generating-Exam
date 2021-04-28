@@ -36,4 +36,5 @@ public interface ExamService {
     Integer getExamScore(Integer exam_id, Integer user_id);
     Integer getMaxQuestionId();
     long saveQuestion(GetQuestion getQuestion)  throws Exception;
+    void saveIsJudge(Integer exam_id, int flag);
 }

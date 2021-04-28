@@ -298,5 +298,11 @@ public class ExamServiceImpl implements ExamService {
         questionRepository.save(question);
         return question.getQuestion_id();
     }
+
+    //老师完成评分
+    @Override
+    public void saveIsJudge(Integer exam_id, int flag) {
+        examRepository.saveIsJudge(exam_id, flag);
+    }
 }
 

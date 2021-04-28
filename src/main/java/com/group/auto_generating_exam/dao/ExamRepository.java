@@ -48,4 +48,8 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
 
     @Query("select u from Exam u where u.exam_id in (:exam_ids) order by u.begin_time desc ")
     List<Exam> getExamsByExamId(List<Integer> exam_ids);
-}
+
+    @Modifying
+    @Transactional
+    @Query("update Exam u set u.is_judge = :is_judge where u.exam_id = :exam_id")
+    void saveIsJudge(@Param("exam_id") Integer exam_id, @Param("is_judge") int is_judge);}

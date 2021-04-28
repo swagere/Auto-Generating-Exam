@@ -539,4 +539,18 @@ public class ExamController {
         }
         return AjaxResponse.success(question_id);
     }
+
+    /**
+     *教师完成评分
+     * @param str
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/completeJudge")
+    public @ResponseBody AjaxResponse completeJudge(@RequestBody String str, HttpServletRequest httpServletRequest) {
+//        authorityCheckService.checkTeacherAuthority(httpServletRequest.getSession().getAttribute("userInfo"));
+        Integer exam_id = Integer.parseInt(JSON.parseObject(str).get("exam_id").toString());
+        examService.saveIsJudge(exam_id, 1);
+        return AjaxResponse.success();
+    }
 }
