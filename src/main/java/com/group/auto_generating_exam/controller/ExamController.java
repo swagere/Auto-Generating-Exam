@@ -357,7 +357,7 @@ public class ExamController {
         Exam exam = new Exam();
         exam.setExam_name(getExam.getExam_name());
         exam.setBegin_time(getExam.getBegin_time());
-        exam.setLast_time(getExam.getLast_time());
+        exam.setLast_time(getExam.getLast_time() * 60 * 1000);
         exam.setSub_id(sub_id);
         exam.setIs_judge(0);
         Integer exam_id = examService.saveExam(exam);
