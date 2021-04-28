@@ -1,6 +1,7 @@
 package com.group.auto_generating_exam.service;
 
 import com.group.auto_generating_exam.model.Exam;
+import com.group.auto_generating_exam.model.GetQuestion;
 import com.group.auto_generating_exam.model.UserExamQuestion;
 
 import java.util.List;
@@ -33,4 +34,6 @@ public interface ExamService {
     List<Exam> getExamBySubId(String sub_id);
     List<Integer> getExamIdsByUserId(Integer user_id);
     Integer getExamScore(Integer exam_id, Integer user_id);
+    Integer getMaxQuestionId();
+    long saveQuestion(GetQuestion getQuestion)  throws Exception;
 }

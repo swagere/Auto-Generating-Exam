@@ -2,16 +2,16 @@ package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.group.auto_generating_exam.config.gene.BasicGene;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
+import com.group.auto_generating_exam.config.gene.GeneOP;
 import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.JudgeService;
 import com.group.auto_generating_exam.service.SubjectService;
 import com.group.auto_generating_exam.service.UserService;
-import com.group.auto_generating_exam.util.ToolUtil;
+import com.group.auto_generating_exam.util.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -45,6 +46,11 @@ public class ExamController {
     JudgeService judgeService;
     @Autowired
     UserService userService;
+    @Autowired
+    GeneOP geneOP;
+    @Autowired
+    RedisUtils redisUtils;
+
 
     /**
      * 学生开始考试时
@@ -101,19 +107,36 @@ public class ExamController {
      * 组卷
      * @return
      */
-    @RequestMapping("/getExam")
-    public @ResponseBody AjaxResponse generateExam() {
-        BasicGene.IntelligentTestSystem intelligentTestSystem = new BasicGene.IntelligentTestSystem();
-        intelligentTestSystem.Initial();
+    @RequestMapping("/generateTest")
+    public @ResponseBody AjaxResponse generateTest() {
+//        BasicGene.IntelligentTestSystem intelligentTestSystem = new BasicGene.IntelligentTestSystem();
+//        intelligentTestSystem.Initial();
+//
+//        for (int epoch = 0; epoch < 1000; epoch++) {
+//            intelligentTestSystem.CalculateFitness();
+//            intelligentTestSystem.Sort();
+//            intelligentTestSystem.Generate();
+//        }
 
-        for (int epoch = 0; epoch < 1000; epoch++) {
-            intelligentTestSystem.CalculateFitness();
-            intelligentTestSystem.Sort();
-            intelligentTestSystem.Generate();
-        }
 
-        return AjaxResponse.success();
+        //设置出题初始参数
+        int score = 100;
+        double diff = 0.5;
+        int[] kind = {10,10,10,0,0,0,0,0,0,0};
+        int[] hard = {20,20,20,30,10};
+        int[] chap = {20,20,20,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] impo = {30,50,20};
+
+//        score, diff, kind, hard, chap, impo
+        int i = geneOP.generateTest(score, diff, kind, hard, chap, impo);
+
+        return AjaxResponse.success(i);
     }
+
+//    @RequestMapping("/generateExam")
+//    public @ResponseBody AjaxResponse generateExam() {
+//
+//    }
 
 
     /**
@@ -458,5 +481,64 @@ public class ExamController {
         }
 
         return AjaxResponse.success(ret);
+    }
+
+    /**
+     * 老师出题
+     */
+    @PostMapping("/saveQuestion")
+    public @ResponseBody AjaxResponse getStuAllExam(@Valid @RequestBody GetQuestion getQuestion, HttpServletRequest httpServletRequest) throws Exception {
+        //先判断是否为添加题目
+        Integer question_id = getQuestion.getQuestion_id();
+        Future<String> future = null;
+        if (question_id == null) {
+            question_id = redisUtils.incr("question_id");   //添加题目 id不存在 就新建一个question_id
+            //判断redis的question_id值是否为目前数据库最大
+            Integer max = examService.getMaxQuestionId();
+            if (max != null && max >= question_id) {
+                question_id = max + 1;
+                redisUtils.set("question_id", max + 1);
+            }
+
+            getQuestion.setQuestion_id(question_id);
+
+
+            //如果是编程题
+            if (getQuestion.getQuestion_type() == (GetQuestion.Type.Normal_Program) || getQuestion.getQuestion_type() == (GetQuestion.Type.SpecialJudge_Program)) {
+                //去question类中找到type
+                int type = 0; //类型1:normal;类型2：special judge
+                if (getQuestion.getQuestion_type() == GetQuestion.Type.Normal_Program) {   //判断编程题目类型
+                    type = 1;
+                } else {
+                    type = 2;
+                }
+                judgeService.saveProgramQuestionFile(question_id, type, getQuestion);
+            }
+        }
+        else {
+            //如果为修改 而且是编程题 删除之前的文件并重新创建
+            if (getQuestion.getQuestion_type() == (GetQuestion.Type.Normal_Program) || getQuestion.getQuestion_type() == (GetQuestion.Type.SpecialJudge_Program)) {
+                //删除
+                judgeService.deleteFile(getQuestion.getQuestion_id());
+
+                //再创建 去question类中找到type
+                int type = 0; //类型1:normal;类型2：special judge
+                if (getQuestion.getQuestion_type() == GetQuestion.Type.Normal_Program) {   //判断编程题目类型
+                    type = 1;
+                } else {
+                    type = 2;
+                }
+                judgeService.saveProgramQuestionFile(question_id, type, getQuestion);
+            }
+        }
+
+        examService.saveQuestion(getQuestion);  //保存到question表
+
+        log.info("题目 添加/更新 成功");
+        if (getQuestion.getQuestion_type() == (GetQuestion.Type.Normal_Program) || getQuestion.getQuestion_type() == (GetQuestion.Type.SpecialJudge_Program)) {
+            judgeService.addTestCase(getQuestion);   //保存到test_case表
+            log.info("添加/更新 测试用例成功");
+        }
+        return AjaxResponse.success(question_id);
     }
 }

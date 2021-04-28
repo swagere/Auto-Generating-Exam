@@ -7,9 +7,11 @@ import com.group.auto_generating_exam.service.SubjectService;
 import com.group.auto_generating_exam.util.RedisUtils;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,9 @@ public class ExamServiceImpl implements ExamService {
     TestCaseRepository testCaseRepository;
     @Autowired
     RedisUtils redisUtils;
+    @Resource
+    private Mapper dozerMapper;
+
 
     //获取试卷列表（学生开始答题）
     @Override
@@ -275,6 +280,21 @@ public class ExamServiceImpl implements ExamService {
             }
         }
         return total;
+    }
+
+    //获得最大的试题号
+    @Override
+    public Integer getMaxQuestionId() {
+        return questionRepository.getMaxQuestionId();
+    }
+
+    //保存一道试题
+    @Override
+    public long saveQuestion(GetQuestion getQuestion) throws Exception {
+        //将getQuestion类转化为question类
+        Question question = dozerMapper.map(getQuestion, Question.class);
+        questionRepository.save(question);
+        return question.getQuestion_id();
     }
 }
 
