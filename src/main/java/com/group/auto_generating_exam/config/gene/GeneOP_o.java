@@ -10,10 +10,13 @@ import com.group.auto_generating_exam.util.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 @Service
-public class GeneOP
+public class GeneOP_o
 {
     @Autowired
     SubjectRepository subjectRepository;
@@ -25,8 +28,7 @@ public class GeneOP
 
         int questionNumber = 0; //题库实际容量
 
-//        TestQuestion[] questions = new TestQuestion[maxNumber];  //试题数组
-        List<TestQuestion> questions = new ArrayList<TestQuestion>(); //试题数组
+        TestQuestion[] questions = new TestQuestion[maxNumber];  //试题数组
 
 
         public int availableClusterNumber = 0;  //试题类别数目
@@ -50,17 +52,14 @@ public class GeneOP
         public void GetDatabaseForTest() {
             questionNumber = 5000;
             for (int i = 0; i < questionNumber; i++) {
-                TestQuestion question = new TestQuestion();
-                question.setId(i);
+                questions[i].setId(i);
 
-                question.setKind(myRand.nextInt(10));
-                question.setHard(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
-                question.setDiff(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
-                question.setScore(myRand.nextInt(19) + 1);
-                question.setChapter(myRand.nextInt(20));
-                question.setImportance(myRand.nextInt(3));
-
-                questions.add(question);
+                questions[i].setKind(myRand.nextInt(10));
+                questions[i].setHard(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
+                questions[i].setDiff(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
+                questions[i].setScore(myRand.nextInt(19) + 1);
+                questions[i].setChapter(myRand.nextInt(20));
+                questions[i].setImportance(myRand.nextInt(3));
             }
         }
 
@@ -68,18 +67,16 @@ public class GeneOP
             //将从数据库中得到的question值赋给questions对象
 
             List<TestQuestion> qs = testQuestionRepository.findAll();
+            questionNumber = 0;
             for (TestQuestion question : qs) {
-                TestQuestion q = new TestQuestion();
-                question.setId(question.id);
-
-                q.setKind(question.kind);
-                q.setHard(question.hard);
-                q.setDiff(question.diff);
-                q.setScore(question.score);
-                q.setChapter(question.chapter);
-                q.setImportance(question.importance);
-
-                questions.add(question);
+                questions[questionNumber].id = question.id;
+                questions[questionNumber].kind = question.kind;
+                questions[questionNumber].score = question.score;
+                questions[questionNumber].hard = question.hard;
+                questions[questionNumber].diff = question.diff;
+                questions[questionNumber].chapter = question.chapter;
+                questions[questionNumber].importance = question.importance;
+                questionNumber++;
             }
         }
 
@@ -97,17 +94,17 @@ public class GeneOP
             for (int i = 0; i < questionNumber; i++) {
                 TestQuestion q = new TestQuestion();
                 q.setId(i);
-                q.setKind(questions.get(i).kind);
-                q.setScore(questions.get(i).score);
-                q.setHard(questions.get(i).hard);
-                q.setDiff(questions.get(i).diff);
-                q.setChapter(questions.get(i).chapter);
-                q.setImportance(questions.get(i).importance);
+                q.setKind(questions[i].kind);
+                q.setScore(questions[i].score);
+                q.setHard(questions[i].hard);
+                q.setDiff(questions[i].diff);
+                q.setChapter(questions[i].chapter);
+                q.setImportance(questions[i].importance);
 
                 q.setContent("question " + i);
                 q.setAnswer("answer " + i);
 
-                testQuestionRepository.save(q);
+//                testQuestionRepository.save(q);
             }
         }
 
@@ -120,10 +117,10 @@ public class GeneOP
         public void SortQuestionByAttribute(){
             for (int i = 0; i < questionNumber; i++) {
                 for (int j = 0; j < questionNumber - i - 1; j++) {
-                    if (questions.get(j).Compare(questions.get(j + 1)) == 2) {
-                        TestQuestion t = questions.get(j);
-                        questions.set(j, questions.get(j + 1));
-                        questions.set(j + 1, t);
+                    if (questions[j].Compare(questions[j + 1]) == 2) {
+                        TestQuestion t = questions[j];
+                        questions[j] = questions[j + 1];
+                        questions[j + 1] = t;
                     }
                 }
             }
@@ -146,7 +143,7 @@ public class GeneOP
             for (int i = 0; i < questionNumber; i++) {
                 if (firstTime == 0) {
                     // 如果是第一个 则初始化为一个类
-                    availableCluster[availableClusterNumber] = questions.get(i);
+                    availableCluster[availableClusterNumber] = questions[i];
                     availableCluster[availableClusterNumber].start = i;
                     availableCluster[availableClusterNumber].count = 1;
 
@@ -154,7 +151,7 @@ public class GeneOP
                 }
                 else {
                     //比较当前的题是不是属于当前类
-                    if (availableCluster[availableClusterNumber].Compare(questions.get(i)) == 0) {
+                    if (availableCluster[availableClusterNumber].Compare(questions[i]) == 0) {
                         //如果是，则更新当前类
 //                        TestQuestion q = availableCluster[availableClusterNumber];
                         availableCluster[availableClusterNumber].count++;
@@ -162,7 +159,7 @@ public class GeneOP
                     else {
                         // 如果不是，则添加新类
                         availableClusterNumber++;
-                        availableCluster[availableClusterNumber] = questions.get(i);
+                        availableCluster[availableClusterNumber] = questions[i];
 
                         availableCluster[availableClusterNumber].start = i;
                         availableCluster[availableClusterNumber].count = 1;
@@ -198,7 +195,7 @@ public class GeneOP
 
         //根据序号获取题目
         public TestQuestion GetQuestionByOrder(int order) {
-            return questions.get(order);
+            return questions[order];
         }
     }
 
@@ -314,7 +311,7 @@ public class GeneOP
             int sameCluster = 1;
 
             //再计算同一类的题目的数目
-            for (int i = 0; i < testNumber - 1; i++) {
+            for (int i = 1; i < testNumber; i++) {
                 if (cc[i] == cc[i + 1]) {
                     sameCluster++;
                 }
@@ -723,7 +720,6 @@ public class GeneOP
             int[] thisChapterDistribute = new int[20]; //实际章节分布
             int[] thisImportanceDistribute = new int[5]; //实际重要性分布
 
-
             double thisDiff = 0;
             double thisScore = 0;
 
@@ -753,6 +749,7 @@ public class GeneOP
             hardDistribute = (int[])thisHardDistribute.clone();
             chapterDistribute = (int[])thisChapterDistribute.clone();
             importanceDistribute = (int[])thisImportanceDistribute.clone();
+
 
             return 1;
         }
@@ -810,11 +807,10 @@ public class GeneOP
                 generateNewGroup_highResolution();
             }
 
-            calculateFitness_highResolution(); // 得到最好的结果的适应度
+            calculateFitness_highResolution(); // 得到最好的结果
 
-            GetResult(0);
-
-            System.out.println(Arrays.deepToString(chromosome));
+            double res = GetResult(0);
+            System.out.println(res);
 
             return 1;
         }
@@ -824,8 +820,6 @@ public class GeneOP
 
     public int generateTest(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
         IntelligentTestSystem intelligentTestSystem = new IntelligentTestSystem();
-
-
         return intelligentTestSystem.GeneratePaperDesign(score, diff, kind, hard, chap, impo);
     }
 

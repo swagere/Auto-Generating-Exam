@@ -7,11 +7,9 @@ import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
 import com.group.auto_generating_exam.config.gene.GeneOP;
 import com.group.auto_generating_exam.model.*;
-import com.group.auto_generating_exam.service.ExamService;
-import com.group.auto_generating_exam.service.JudgeService;
-import com.group.auto_generating_exam.service.SubjectService;
-import com.group.auto_generating_exam.service.UserService;
+import com.group.auto_generating_exam.service.*;
 import com.group.auto_generating_exam.util.RedisUtils;
+import com.group.auto_generating_exam.util.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,10 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 /**
@@ -50,6 +45,9 @@ public class ExamController {
     GeneOP geneOP;
     @Autowired
     RedisUtils redisUtils;
+    @Autowired
+    GenerateTrainService generateTrainService;
+
 
 
     /**
@@ -122,10 +120,10 @@ public class ExamController {
         //设置出题初始参数
         int score = 100;
         double diff = 0.5;
-        int[] kind = {10,10,10,0,0,0,0,0,0,0};
-        int[] hard = {20,20,20,30,10};
-        int[] chap = {20,20,20,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-        int[] impo = {30,50,20};
+        int[] kind = {10,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] hard = {20,20,20,30,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] chap = {20,20,20,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] impo = {30,50,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 //        score, diff, kind, hard, chap, impo
         int i = geneOP.generateTest(score, diff, kind, hard, chap, impo);
@@ -133,10 +131,12 @@ public class ExamController {
         return AjaxResponse.success(i);
     }
 
-//    @RequestMapping("/generateExam")
-//    public @ResponseBody AjaxResponse generateExam() {
-//
-//    }
+
+    @RequestMapping("/generateTrain")
+    public @ResponseBody AjaxResponse generateTrain() {
+        generateTrainService.generateTrain();
+        return AjaxResponse.success();
+    }
 
 
     /**

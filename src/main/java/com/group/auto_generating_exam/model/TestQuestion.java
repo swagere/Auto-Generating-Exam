@@ -1,10 +1,11 @@
-package com.group.auto_generating_exam.config.gene;
+package com.group.auto_generating_exam.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -18,19 +19,37 @@ import java.io.Serializable;
 @Table(name = "test_question")
 public class TestQuestion implements Serializable {
     @Id
+    @Column
     public Integer id;
 
+    @Column
     public Integer kind; //题型
+
+    @Column
     public Double hard; //难度
+
+    @Column
     public Double diff; //区分度
+
+    @Column
     public Integer score; //分数
+
+    @Column
     public Integer chapter; //所属章节
+
+    @Column
     public Integer importance; //重要性
 
+    @Column
     public Integer start; //这一类在试题库中的起始位置（要转换成具体的题目） 【题库按难度、区分度等存放】
+
+    @Column
     public Integer count; //当前类中一共有多少题目
 
+    @Column
     public String content;
+
+    @Column
     public String answer;
 
 

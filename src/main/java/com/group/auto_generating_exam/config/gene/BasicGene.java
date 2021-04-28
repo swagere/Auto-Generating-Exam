@@ -15,7 +15,8 @@ import com.group.auto_generating_exam.util.TimeUtils;
  *
  */
 
-public class BasicGene {
+public class
+BasicGene {
 
     public static class IntelligentTestSystem
     {

@@ -1,6 +1,6 @@
 package com.group.auto_generating_exam.dao;
 
-import com.group.auto_generating_exam.config.gene.TestQuestion;
+import com.group.auto_generating_exam.model.TestQuestion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -13,6 +13,4 @@ public interface TestQuestionRepository extends JpaRepository<TestQuestion, Inte
     @Query("select max(id) from TestQuestion ")
     Integer getMaxTestQuestionId();
 
-    @Query(value = "select * from TestQuestion",nativeQuery = true)
-    List<TestQuestion> findTestQuestion();
 }
