@@ -25,7 +25,6 @@ public class GeneOP
 
         int questionNumber = 0; //题库实际容量
 
-//        TestQuestion[] questions = new TestQuestion[maxNumber];  //试题数组
         List<TestQuestion> questions = new ArrayList<TestQuestion>(); //试题数组
 
 
@@ -64,10 +63,10 @@ public class GeneOP
             }
         }
 
+        //将从数据库中得到的question值赋给questions对象
         public void GetTestQuestionFromDatabase() {
-            //将从数据库中得到的question值赋给questions对象
-
             List<TestQuestion> qs = testQuestionRepository.findAll();
+            questionNumber = GetMaxTestQuestion(); //初始化试题库中总题目数
             for (TestQuestion question : qs) {
                 TestQuestion q = new TestQuestion();
                 question.setId(question.id);
@@ -94,7 +93,7 @@ public class GeneOP
         public void GenerateQuestionDatabase() {
             GetDatabaseForTest(); //初始化questions[]
 
-            for (int i = 0; i < questionNumber; i++) {
+            for (int i = 1380; i < questionNumber; i++) {
                 TestQuestion q = new TestQuestion();
                 q.setId(i);
                 q.setKind(questions.get(i).kind);
@@ -224,7 +223,7 @@ public class GeneOP
         //--常量---------------------------
         int score;
         double diff;
-        int testNumber;
+        int testNumber; //需要组卷的试题总数
         int[] testKind = new int[50];
         int[] hardDistribute = new int[50];
         int[] chapterDistribute = new int[50];
@@ -389,7 +388,7 @@ public class GeneOP
                 TestQuestion q = database.GetQuestionClusterByOrder(order);
 
                 int nScore = q.score;
-                thisDiff +=q.score * q.diff;
+                thisDiff += q.score * q.diff;
 
                 thisScore += nScore;
                 thisHardDistribute[q.HardN()] += nScore; //求出每个等级实际的分数
@@ -761,8 +760,8 @@ public class GeneOP
             //初始化处理
             SetPaperAttribute(score, diff, kind, hard, chap, impo);
 //            database.GenerateQuestionDatabase();
-//            database.GetTestQuestionFromDatabase();
-            database.GetDatabaseForTest();
+            database.GetTestQuestionFromDatabase(); // 从数据库中读取全部题目
+//            database.GetDatabaseForTest();
 
 
             database.PreOperation(); // 预处理数据：将试题聚类，并且得到每个类的信息
