@@ -782,8 +782,8 @@ public class GeneOP
                 for (int i = 0; i < testNumber; i++) {
                     for (int j = 0; j < testNumber - i - 1; j++) {
                         int t = chromosome[n][j + 1];
-                        chromosome[n][j] = chromosome[n][j + 1];
-                        chromosome[n][j + 1] = t;
+                        chromosome[n][j + 1] = chromosome[n][j ];
+                        chromosome[n][j] = t;
                     }
                 }
             }
@@ -814,7 +814,7 @@ public class GeneOP
 
             GetResult(0);
 
-            System.out.println(Arrays.deepToString(chromosome));
+            System.out.println(Arrays.toString(chromosome[0]));
 
             return 1;
         }
