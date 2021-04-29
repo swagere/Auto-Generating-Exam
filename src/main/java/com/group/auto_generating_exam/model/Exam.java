@@ -15,11 +15,6 @@ import java.io.Serializable;
 @Builder
 @Table(name = "exam")
 public class Exam implements Serializable {
-    public static enum ProgressStatus {
-        WILL,
-        ING,
-        DONE,
-    }
 
     @Id
     @Column
@@ -40,8 +35,4 @@ public class Exam implements Serializable {
 
     @Column
     private Integer is_judge;
-
-    @Column
-    @Enumerated(EnumType.STRING)
-    private ProgressStatus progress_status = ProgressStatus.WILL; //状态
 }

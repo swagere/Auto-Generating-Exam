@@ -45,8 +45,6 @@ public class ExamController {
     GeneOP geneOP;
     @Autowired
     RedisUtils redisUtils;
-    @Autowired
-    GenerateTrainService generateTrainService;
 
 
 
@@ -75,18 +73,11 @@ public class ExamController {
 
 
         //考试是否正在进行
-//        String examIsProgressing = examService.examIsProgressing(exam_id);
-//        if (examIsProgressing.equals("will")) {
-//            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始"));
-//        }
-//        if (examIsProgressing.equals("over")) {
-//            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束"));
-//        }
-        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
-        if (progress_status.equals(Exam.ProgressStatus.WILL)) {
+        String progress_status = examService.examIsProgressing(exam_id);
+        if (progress_status.equals("will")) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始"));
         }
-        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+        if (progress_status.equals("over")) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束"));
         }
 
@@ -132,13 +123,6 @@ public class ExamController {
     }
 
 
-    @RequestMapping("/generateTrain")
-    public @ResponseBody AjaxResponse generateTrain() {
-        generateTrainService.generateTrain();
-        return AjaxResponse.success();
-    }
-
-
     /**
      * 老师更改考试时间
      * 若考试时间改变，则通知前端新的持续时间
@@ -164,8 +148,8 @@ public class ExamController {
         }
 
         //判断该考试是否已经结束 若结束则无法修改
-        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
-        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+        String progress_status = examService.examIsProgressing(exam_id);
+        if (progress_status.equals("over")) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束，无法修改考试时间"));
         }
 
@@ -215,15 +199,15 @@ public class ExamController {
 
 
         //判断该考试是否已经结束 若结束则无法提前终止
-        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
-        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+        String progress_status = examService.examIsProgressing(exam_id);
+        if (progress_status.equals("will")) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始，无法提前结束"));
+        }
+        if (progress_status.equals("over")) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束"));
         }
 
-        //判断该考试是否还未开始 若还未开始则无法提前终止
-        if (progress_status.equals(Exam.ProgressStatus.WILL)) {
-            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始，无法提前结束"));
-        }
+
 
         //结束考试
         examService.endExam(exam_id);
@@ -298,12 +282,11 @@ public class ExamController {
 //            result.put("message","用户没有选择该课程，不能参与考试");
         }
         //检测是否超过考试时间(//判断是否为该考试结束一分钟之后交试卷)/还未开始考试 若超过考试时间则不能考试
-        Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
-        if (progress_status.equals(Exam.ProgressStatus.WILL)) {
+        String progress_status = examService.examIsProgressing(exam_id);
+        if (progress_status.equals("will")) {
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试还未开始"));
-//            result.put("message","该考试还未开始");
         }
-        if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+        if (progress_status.equals("over")) {
             //判断是否为该考试结束一分钟之后交卷
             if (examService.isExamDoneOverOne(exam_id)) {
                 return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试已结束，不能再提交试卷"));
@@ -408,19 +391,20 @@ public class ExamController {
             exam.put("last_time", exam_origin.getLast_time() / 1000 / 60);
 
             //exam_status
-            Exam.ProgressStatus progressStatus = exam_origin.getProgress_status();
-            if (progressStatus.equals(Exam.ProgressStatus.WILL)) {
+            String progress_status = examService.examIsProgressing(exam_origin.getExam_id());
+            if (progress_status.equals("will")) {
                 exam.put("exam_status", 0);
             }
-            else if (progressStatus.equals(Exam.ProgressStatus.ING)) {
+            else if (progress_status.equals("ing")) {
                 exam.put("exam_status", 1);
             }
-            else if (progressStatus.equals(Exam.ProgressStatus.DONE) && exam_origin.getIs_judge().equals(0)) {
+            else if (progress_status.equals("over") &&  exam_origin.getIs_judge().equals(0)) {
                 exam.put("exam_status", 2);
             }
-            else if (progressStatus.equals(Exam.ProgressStatus.DONE) && exam_origin.getIs_judge().equals(1)) {
+            else if (progress_status.equals("over") &&  exam_origin.getIs_judge().equals(1)) {
                 exam.put("exam_status", 3);
             }
+
 
             exams.add(exam);
         }
@@ -460,22 +444,24 @@ public class ExamController {
             exam.put("tea_name", userService.getUserNameByUserId(user_id));
 
             //exam_status
-            Exam.ProgressStatus progressStatus = exam_origin.getProgress_status();
-            if (progressStatus.equals(Exam.ProgressStatus.WILL)) {
+            String progress_status = examService.examIsProgressing(exam_origin.getExam_id());
+            if (progress_status.equals("will")) {
                 exam.put("exam_status", 0);
             }
-            else if (progressStatus.equals(Exam.ProgressStatus.ING)) {
+            else if (progress_status.equals("ing")) {
                 exam.put("exam_status", 1);
             }
-            else if (progressStatus.equals(Exam.ProgressStatus.DONE) && exam_origin.getIs_judge().equals(0)) {
+            else if (progress_status.equals("over") &&  exam_origin.getIs_judge().equals(0)) {
                 exam.put("exam_status", 2);
             }
-            else if (progressStatus.equals(Exam.ProgressStatus.DONE) && exam_origin.getIs_judge().equals(1)) {
+            else if (progress_status.equals("over") &&  exam_origin.getIs_judge().equals(1)) {
                 exam.put("exam_status", 3);
 
                 //已评分 返回分数
                 exam.put("score", examService.getExamScore(exam_origin.getExam_id(), user_id));
             }
+
+
 
             ret.add(exam);
         }

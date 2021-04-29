@@ -2,6 +2,9 @@ package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.group.auto_generating_exam.config.exception.AjaxResponse;
+import com.group.auto_generating_exam.config.exception.CustomException;
+import com.group.auto_generating_exam.config.exception.CustomExceptionType;
 import com.group.auto_generating_exam.model.Exam;
 import com.group.auto_generating_exam.model.Question;
 import com.group.auto_generating_exam.service.ExamService;
@@ -143,16 +146,15 @@ public class WebSocketServer {
                 result.put("message","用户没有选择该课程，不能参与考试");
             }
             //检测是否超过考试时间/还未开始考试 若超过考试时间则不能考试
-            Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
-            if (progress_status.equals(Exam.ProgressStatus.WILL)) {
+            String progress_status = examService.examIsProgressing(exam_id);
+            if (progress_status.equals("will")) {
                 result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
                 result.put("message","该考试还未开始");
             }
-            if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+            if (progress_status.equals("over")) {
                 result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
                 result.put("message","该考试已结束");
-            }
-
+        }
 
             //检测是否已经分发给他试卷 若没有分发试卷则判定无法开始考试
             List<Integer> questionIds = examService.getStuExamQuestionIds(exam_id, user_id);
@@ -192,14 +194,14 @@ public class WebSocketServer {
                 result.put("message","用户没有选择该课程，不能参与考试");
             }
             //检测是否超过考试时间/还未开始考试 若超过考试时间则不能考试
-            Exam.ProgressStatus progress_status = examService.getExamProgressStatus(exam_id);
-            if (progress_status.equals(Exam.ProgressStatus.WILL)) {
+            String progress_status = examService.examIsProgressing(exam_id);
+            if (progress_status.equals("will")) {
                 result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
                 result.put("message","该考试还未开始");
             }
-            if (progress_status.equals(Exam.ProgressStatus.DONE)) {
+            if (progress_status.equals("over")) {
                 result.put("type","10002"); //type为10000表考试开始时返回，10002为请求失败
-                result.put("message","该考试已结束");
+                result.put("message","该考试还未开始");
             }
 
 

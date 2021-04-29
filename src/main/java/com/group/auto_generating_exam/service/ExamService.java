@@ -14,11 +14,10 @@ import java.util.Map;
 
 public interface ExamService {
     Map getExamQuestionList(Integer exam_id, Integer user_id);
-//    String examIsProgressing(Integer exam_id);
+    String examIsProgressing(Integer exam_id);
     Boolean isExamExist(Integer exam_id);
     Boolean isStuInExam(Integer exam_id, Integer user_id);
     Boolean isCommit(Integer exam_id, Integer user_id);
-    Exam.ProgressStatus getExamProgressStatus(Integer Exam);
     List<Integer> getStuExamQuestionIds(Integer exam_id, Integer user_id);
     String getSubIdByExamId(Integer exam_id);
     void saveLastTime(Long last_time, Integer exam_id);

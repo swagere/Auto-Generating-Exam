@@ -109,21 +109,21 @@ public class ExamServiceImpl implements ExamService {
     }
 
     //判断考试是否正在进行
-//    @Override
-//    public String examIsProgressing(Integer exam_id) {
-//        //判断考试时间是否开始 考试是否结束
-//        Long exam_time = examRepository.getBeginTimeByExamId(exam_id);
-//        Long last_time = examRepository.getLastTimeByExamId(exam_id);
-//        Long now_time = System.currentTimeMillis();
-//
-//        if (exam_time > now_time) {
-//            return "will";
-//        }
-//        else if (exam_time + last_time * 60000 < now_time) {
-//            return "over";
-//        }
-//        return "progressing";
-//    }
+    @Override
+    public String examIsProgressing(Integer exam_id) {
+        //判断考试时间是否开始 考试是否结束
+        Long exam_time = examRepository.getBeginTimeByExamId(exam_id);
+        Long last_time = examRepository.getLastTimeByExamId(exam_id);
+        Long now_time = System.currentTimeMillis();
+
+        if (exam_time > now_time) {
+            return "will";
+        }
+        else if (exam_time + last_time * 60000 < now_time) {
+            return "over";
+        }
+        return "ing";
+    }
 
     //用户是否有该门考试
     @Override
@@ -143,12 +143,6 @@ public class ExamServiceImpl implements ExamService {
             }
         }
         return false;
-    }
-
-    //返回考试状态
-    @Override
-    public Exam.ProgressStatus getExamProgressStatus(Integer exam_id) {
-        return examRepository.getProgressStatusByExamId(exam_id);
     }
 
     //查询学生已获取试卷的题号列表（user_exam_question）
@@ -177,7 +171,6 @@ public class ExamServiceImpl implements ExamService {
         Long now_time = System.currentTimeMillis();
         Long last_time = now_time - begin_time;
         examRepository.updateLastTime(last_time, exam_id);
-        examRepository.updateProgressStatus(exam_id, Exam.ProgressStatus.DONE);
     }
 
     //返回考试剩余时间 如果考试未开始则返回null
@@ -238,7 +231,6 @@ public class ExamServiceImpl implements ExamService {
         //编辑试卷信息
         if (exam.getExam_id() != null) {
             //如果exam_id为空
-            exam.setProgress_status(Exam.ProgressStatus.WILL);
             examRepository.save(exam);
             return exam.getExam_id();
         } else {
@@ -251,7 +243,6 @@ public class ExamServiceImpl implements ExamService {
                 exam_id = max + 1;
                 redisUtils.set("exam_id", max + 1);
             }
-            exam.setProgress_status(Exam.ProgressStatus.WILL);
             System.out.println(exam_id);
             exam.setExam_id(exam_id);
             examRepository.save(exam);
