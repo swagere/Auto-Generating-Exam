@@ -15,13 +15,13 @@ import java.io.Serializable;
 @Entity
 @Table(name = "question")
 public class Question implements Serializable {
-    public static enum QuestionType {
-        Single,
-        Judge,
-        Discussion,
-        Normal_Program,
-        SpecialJudge_Program;
-        }
+//    public static enum QuestionType {
+//        Single,1
+//        Judge,2
+//        Discussion,3
+//        Normal_Program,4
+//        SpecialJudge_Program;5
+//        }
 
     @Id
     @Column
@@ -34,10 +34,7 @@ public class Question implements Serializable {
     private String sub_id;
 
     @Column
-    private String tag;
-
-    @Column
-    private Integer level;
+    private Integer user_id;
 
     @Column
     private String options;
@@ -46,9 +43,20 @@ public class Question implements Serializable {
     private String answer;
 
     @Column
-    @Enumerated(EnumType.STRING)
-    private QuestionType question_type  = null;
+    private Integer kind;
 
     @Column
     private String tip;
+
+    @Column
+    private Double hard;
+
+    @Column
+    private Double diff;
+
+    @Column
+    private Integer importance;
+
+    @Column
+    private Integer chapter;
 }

@@ -5,11 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
-import com.group.auto_generating_exam.config.gene.GeneOP;
+import com.group.auto_generating_exam.config.gene.GeneOP_Origin;
 import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.*;
 import com.group.auto_generating_exam.util.RedisUtils;
-import com.group.auto_generating_exam.util.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,7 +41,7 @@ public class ExamController {
     @Autowired
     UserService userService;
     @Autowired
-    GeneOP geneOP;
+    GeneOP_Origin geneOP;
     @Autowired
     RedisUtils redisUtils;
 
@@ -481,19 +480,19 @@ public class ExamController {
             question_id = redisUtils.incr("question_id");   //添加题目 id不存在 就新建一个question_id
             //判断redis的question_id值是否为目前数据库最大
             Integer max = examService.getMaxQuestionId();
-            if (max != null && max >= question_id) {
+            if (max != null && max + 1 != question_id) {
                 question_id = max + 1;
                 redisUtils.set("question_id", max + 1);
             }
 
-            getQuestion.setQuestion_id(question_id);
+            getQuestion.setQuestion_id(max + 1); //保证数据库中题目连贯
 
 
             //如果是编程题
-            if (getQuestion.getQuestion_type() == (GetQuestion.Type.Normal_Program) || getQuestion.getQuestion_type() == (GetQuestion.Type.SpecialJudge_Program)) {
+            if (getQuestion.getKind().equals(4) || getQuestion.getKind().equals(5)) {
                 //去question类中找到type
                 int type = 0; //类型1:normal;类型2：special judge
-                if (getQuestion.getQuestion_type() == GetQuestion.Type.Normal_Program) {   //判断编程题目类型
+                if (getQuestion.getKind().equals(4)) {   //判断编程题目类型
                     type = 1;
                 } else {
                     type = 2;
@@ -503,13 +502,13 @@ public class ExamController {
         }
         else {
             //如果为修改 而且是编程题 删除之前的文件并重新创建
-            if (getQuestion.getQuestion_type() == (GetQuestion.Type.Normal_Program) || getQuestion.getQuestion_type() == (GetQuestion.Type.SpecialJudge_Program)) {
+            if (getQuestion.getKind().equals(4) || getQuestion.getKind().equals(5)) {
                 //删除
                 judgeService.deleteFile(getQuestion.getQuestion_id());
 
                 //再创建 去question类中找到type
                 int type = 0; //类型1:normal;类型2：special judge
-                if (getQuestion.getQuestion_type() == GetQuestion.Type.Normal_Program) {   //判断编程题目类型
+                if (getQuestion.getKind().equals(4)) {   //判断编程题目类型
                     type = 1;
                 } else {
                     type = 2;
@@ -520,7 +519,7 @@ public class ExamController {
 
         examService.saveQuestion(getQuestion);  //保存到question表
 
-        if (getQuestion.getQuestion_type() == (GetQuestion.Type.Normal_Program) || getQuestion.getQuestion_type() == (GetQuestion.Type.SpecialJudge_Program)) {
+        if (getQuestion.getKind().equals(4) || getQuestion.getKind().equals(5)) {
             judgeService.addTestCase(getQuestion);   //保存到test_case表
         }
         return AjaxResponse.success(question_id);

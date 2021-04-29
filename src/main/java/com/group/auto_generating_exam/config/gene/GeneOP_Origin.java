@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class GeneOP
+public class GeneOP_Origin
 {
     @Autowired
     SubjectRepository subjectRepository;
@@ -46,24 +46,24 @@ public class GeneOP
         }
 
         //初始化questions[]
-//        public void GetDatabaseForTest() {
-//            questionNumber = 5000;
-//            for (int i = 0; i < questionNumber; i++) {
-//                TestQuestion question = new TestQuestion();
-//                question.setId(i);
-//
-//                question.setKind(myRand.nextInt(10));
-//                question.setHard(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
-//                question.setDiff(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
-//                question.setScore(myRand.nextInt(19) + 1);
-//                question.setChapter(myRand.nextInt(20));
-//                question.setImportance(myRand.nextInt(3));
-//
-//                questions.add(question);
-//            }
-//        }
+        public void GetDatabaseForTest() {
+            questionNumber = 5000;
+            for (int i = 0; i < questionNumber; i++) {
+                TestQuestion question = new TestQuestion();
+                question.setId(i);
 
-        //将从数据库中得到的question值赋给questions对象 并通过输入初始化分数
+                question.setKind(myRand.nextInt(10));
+                question.setHard(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
+                question.setDiff(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
+                question.setScore(myRand.nextInt(19) + 1);
+                question.setChapter(myRand.nextInt(20));
+                question.setImportance(myRand.nextInt(3));
+
+                questions.add(question);
+            }
+        }
+
+        //将从数据库中得到的question值赋给questions对象
         public void GetTestQuestionFromDatabase() {
             List<TestQuestion> qs = testQuestionRepository.findAll();
             questionNumber = GetMaxTestQuestion(); //初始化试题库中总题目数
@@ -90,25 +90,25 @@ public class GeneOP
         }
 
         //将初始化的随机题目存入数据库
-//        public void GenerateQuestionDatabase() {
-//            GetDatabaseForTest(); //初始化questions[]
-//
-//            for (int i = 1380; i < questionNumber; i++) {
-//                TestQuestion q = new TestQuestion();
-//                q.setId(i);
-//                q.setKind(questions.get(i).kind);
-//                q.setScore(questions.get(i).score);
-//                q.setHard(questions.get(i).hard);
-//                q.setDiff(questions.get(i).diff);
-//                q.setChapter(questions.get(i).chapter);
-//                q.setImportance(questions.get(i).importance);
-//
-//                q.setContent("question " + i);
-//                q.setAnswer("answer " + i);
-//
-//                testQuestionRepository.save(q);
-//            }
-//        }
+        public void GenerateQuestionDatabase() {
+            GetDatabaseForTest(); //初始化questions[]
+
+            for (int i = 1380; i < questionNumber; i++) {
+                TestQuestion q = new TestQuestion();
+                q.setId(i);
+                q.setKind(questions.get(i).kind);
+                q.setScore(questions.get(i).score);
+                q.setHard(questions.get(i).hard);
+                q.setDiff(questions.get(i).diff);
+                q.setChapter(questions.get(i).chapter);
+                q.setImportance(questions.get(i).importance);
+
+                q.setContent("question " + i);
+                q.setAnswer("answer " + i);
+
+                testQuestionRepository.save(q);
+            }
+        }
 
         public void ConvertDatabase() {
             //select one info???

@@ -40,18 +40,18 @@ public class ToolUtil {
         return list;
     }
 
-    //string转Question.Type
-    public static Question.QuestionType String2QuestionType(String s) {
+    //string转Question.kind int
+    public static int String2KindInt(String s) {
         switch (s) {
             case "Single":
-                return Question.QuestionType.Single;
+                return 1;
             case "Discussion":
-                return Question.QuestionType.Discussion;
+                return 2;
             case "Judge":
-                return Question.QuestionType.Judge;
+                return 5;
             case "Normal_Program":
-                return Question.QuestionType.Normal_Program;
+                return 3;
         }
-        return Question.QuestionType.SpecialJudge_Program;
+        return 4;
     }
 }

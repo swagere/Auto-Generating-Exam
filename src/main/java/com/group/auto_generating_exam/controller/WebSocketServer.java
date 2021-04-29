@@ -220,7 +220,6 @@ public class WebSocketServer {
             }
 
             //将传过来的数据存入user_exam_question表中
-            Question.QuestionType questionType = ToolUtil.String2QuestionType(JSON.parseObject(message).get("type").toString());
             List questions = ToolUtil.String2List(JSON.parseObject(message).get("data").toString());
 
             Integer error = 0;

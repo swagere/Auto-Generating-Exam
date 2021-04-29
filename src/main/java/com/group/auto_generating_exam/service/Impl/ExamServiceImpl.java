@@ -70,17 +70,17 @@ public class ExamServiceImpl implements ExamService {
                 userExamQuestionRepository.save(userExamQuestion);
 
                 //传到前端页面
-                GetExamQuestion getQuestion = new GetExamQuestion(question_id, question.getQuestion(), question.getOptions(), question.getQuestion_type(), question.getTip(),null, null);
-                if (question.getQuestion_type() == Question.QuestionType.Single) {
+                GetExamQuestion getQuestion = new GetExamQuestion(question_id, question.getQuestion(), question.getOptions(), question.getKind(), question.getTip(),null, null);
+                if (question.getKind().equals(1)) {
                     singleList.add(getQuestion);
                 }
-                else if (question.getQuestion_type() == Question.QuestionType.Judge) {
+                else if (question.getKind().equals(2)) {
                     judgeList.add(getQuestion);
                 }
-                else if (question.getQuestion_type() == Question.QuestionType.Discussion) {
+                else if (question.getKind().equals(5)) {
                     discussionList.add(getQuestion);
                 }
-                else if (question.getQuestion_type() == Question.QuestionType.Normal_Program || question.getQuestion_type() == Question.QuestionType.SpecialJudge_Program) {
+                else if (question.getKind().equals(4) || question.getKind().equals(5)) {
                     TestCase testCase = testCaseRepository.getTestCaseByQuestionId(question_id);
                     String input = testCase.getInput();
                     String output = testCase.getOutput();
