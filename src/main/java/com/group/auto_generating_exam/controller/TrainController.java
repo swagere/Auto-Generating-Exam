@@ -2,17 +2,13 @@ package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
-import com.group.auto_generating_exam.config.gene.GeneOP;
-import com.group.auto_generating_exam.config.gene.GeneOP_Origin;
+import com.group.auto_generating_exam.config.gene.GeneOP_o;
+import com.group.auto_generating_exam.config.gene.GeneOP_oo;
 import com.group.auto_generating_exam.dao.TestQuestionRepository;
-import com.group.auto_generating_exam.model.Subject;
-import com.group.auto_generating_exam.model.TestQuestion;
-import com.group.auto_generating_exam.service.SubjectService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,7 +30,7 @@ import java.util.Map;
 public class TrainController {
 
     @Autowired
-    GeneOP geneOP;
+    GeneOP_o geneOP;
     @Autowired
     TestQuestionRepository testQuestionRepository;
 
@@ -66,8 +62,10 @@ public class TrainController {
         //设置出题初始参数
 
         int[] kind = new int[50];
+        int count = 0;
         for (int i = 0; i < kind_origin.size(); i++) {
             kind[i] = Integer.parseInt((String) kind_origin.get(i));
+            count += kind[i];
         }
 
         int[] hard = new int[50];
@@ -102,33 +100,58 @@ public class TrainController {
         List r_2 = new ArrayList();
         List r_3 = new ArrayList();
         List r_4 = new ArrayList();
+        List r_5 = new ArrayList();
+        List r_6 = new ArrayList();
+        List r_7 = new ArrayList();
+        List r_8 = new ArrayList();
+        List r_9 = new ArrayList();
 
-        for (int i = 0; i < questions.length; i++) {
+        for (int i = 0; i < count; i++) {
             int id = questions[i];
-            if (id != 0) {
-                Integer k = testQuestionRepository.getKindById(id);
-                if (k.equals(0)) {
-                    r_0.add(id);
-                }
-                else if (k.equals(1)) {
-                    r_1.add(i);
-                }
-                else if (k.equals(2)) {
-                    r_2.add(id);
-                }
-                else if (k.equals(3)) {
-                    r_3.add(id);
-                }
-                else if (k.equals(4)) {
-                    r_4.add(id);
-                }
+            Integer k = testQuestionRepository.getKindById(id);
+            if (k.equals(0)) {
+                r_0.add(id);
             }
+            else if (k.equals(1)) {
+                r_1.add(i);
+            }
+            else if (k.equals(2)) {
+                r_2.add(id);
+            }
+            else if (k.equals(3)) {
+                r_3.add(id);
+            }
+            else if (k.equals(4)) {
+                r_4.add(id);
+            }
+            else if (k.equals(5)) {
+                r_5.add(id);
+            }
+            else if (k.equals(6)) {
+                r_6.add(id);
+            }
+            else if (k.equals(7)) {
+                r_7.add(id);
+            }
+            else if (k.equals(8)) {
+                r_8.add(id);
+            }
+            else if (k.equals(9)) {
+                r_9.add(id);
+            }
+
         }
         res.put("0",r_0);
         res.put("1",r_1);
         res.put("2",r_2);
         res.put("3",r_3);
         res.put("4",r_4);
+        res.put("5",r_5);
+        res.put("6",r_6);
+        res.put("7",r_7);
+        res.put("8",r_8);
+        res.put("9",r_9);
+
 
 //        geneOP.generateQuestion();
         return AjaxResponse.success(res);

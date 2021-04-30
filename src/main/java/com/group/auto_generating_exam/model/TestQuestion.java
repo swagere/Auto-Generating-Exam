@@ -92,8 +92,8 @@ public class TestQuestion implements Serializable {
     // 排序
     // 1. 题型；2. 难度；3. 区分度；4. 分数
     public int Compare(TestQuestion b) {
-        if (kind < b.kind) return 1;
-        if (kind > b.kind) return 2;
+        if (KindN() < b.KindN()) return 1;
+        if (KindN() > b.KindN()) return 2;
 
         if (HardN() < b.HardN()) return 1;
         if (HardN() > b.HardN()) return 2;

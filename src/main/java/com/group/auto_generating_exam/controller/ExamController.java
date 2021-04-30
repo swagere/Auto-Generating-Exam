@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
-import com.group.auto_generating_exam.config.gene.GeneOP_Origin;
 import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.*;
 import com.group.auto_generating_exam.util.RedisUtils;

@@ -10,10 +10,13 @@ import com.group.auto_generating_exam.util.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 @Service
-public class GeneOP_Origin
+public class GeneOP_o
 {
     @Autowired
     SubjectRepository subjectRepository;
@@ -93,7 +96,7 @@ public class GeneOP_Origin
         public void GenerateQuestionDatabase() {
             GetDatabaseForTest(); //初始化questions[]
 
-            for (int i = 1380; i < questionNumber; i++) {
+            for (int i = 0; i < questionNumber; i++) {
                 TestQuestion q = new TestQuestion();
                 q.setId(i);
                 q.setKind(questions.get(i).kind);
@@ -175,6 +178,7 @@ public class GeneOP_Origin
                     availableKindRange[n] = availableKindRange[nKind + 1];
                 }
             }
+            System.out.println(1);
         }
 
         //--低分辨率下的遗传算法---------------------------------------------
