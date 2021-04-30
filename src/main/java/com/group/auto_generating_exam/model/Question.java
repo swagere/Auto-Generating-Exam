@@ -28,7 +28,7 @@ public class Question implements Serializable {
     private Integer question_id;
 
     @Column
-    private String question;
+    private String content;
 
     @Column
     private String sub_id;

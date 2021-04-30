@@ -70,7 +70,7 @@ public class ExamServiceImpl implements ExamService {
                 userExamQuestionRepository.save(userExamQuestion);
 
                 //传到前端页面
-                GetExamQuestion getQuestion = new GetExamQuestion(question_id, question.getQuestion(), question.getOptions(), question.getKind(), question.getTip(),null, null);
+                GetExamQuestion getQuestion = new GetExamQuestion(question_id, question.getContent(), question.getOptions(), question.getKind(), question.getTip(),null, null);
                 if (question.getKind().equals(0)) {
                     singleList.add(getQuestion);
                 }

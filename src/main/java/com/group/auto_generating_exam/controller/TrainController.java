@@ -3,10 +3,10 @@ package com.group.auto_generating_exam.controller;
 import com.alibaba.fastjson.JSON;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.gene.GeneOP_o;
-import com.group.auto_generating_exam.dao.TestQuestionRepository;
+import com.group.auto_generating_exam.dao.QuestionRepository;
+import com.group.auto_generating_exam.model.Question;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +32,7 @@ public class TrainController {
     @Autowired
     GeneOP_o geneOP;
     @Autowired
-    TestQuestionRepository testQuestionRepository;
+    QuestionRepository questionRepository;
 
 
     /**
@@ -104,7 +104,7 @@ public class TrainController {
 
         for (int i = 0; i < count; i++) {
             int id = ids[i];
-            Integer k = testQuestionRepository.getKindById(id);
+            Integer k = questionRepository.getKindById(id);
             if (k.equals(0)) {
                 r_0.add(id);
             }

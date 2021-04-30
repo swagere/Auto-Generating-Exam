@@ -10,4 +10,8 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     @Query("select max(question_id) from Question ")
     Integer getMaxQuestionId();
+
+
+    @Query("select s.kind from Question s where s.id = ?1")
+    Integer getKindById(Integer id);
 }

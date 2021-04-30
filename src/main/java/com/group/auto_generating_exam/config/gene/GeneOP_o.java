@@ -2,8 +2,9 @@ package com.group.auto_generating_exam.config.gene;
 
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
+import com.group.auto_generating_exam.dao.QuestionRepository;
 import com.group.auto_generating_exam.dao.SubjectRepository;
-import com.group.auto_generating_exam.dao.TestQuestionRepository;
+import com.group.auto_generating_exam.model.Question;
 import com.group.auto_generating_exam.model.Subject;
 import com.group.auto_generating_exam.model.TestQuestion;
 import com.group.auto_generating_exam.util.TimeUtils;
@@ -21,7 +22,7 @@ public class GeneOP_o
     @Autowired
     SubjectRepository subjectRepository;
     @Autowired
-    TestQuestionRepository testQuestionRepository;
+    QuestionRepository questionRepository;
 
     public class QuestionDatabase {
         int maxNumber = 10000;  //题库最大容量
@@ -68,20 +69,29 @@ public class GeneOP_o
 
         //将从数据库中得到的question值赋给questions对象
         public void GetTestQuestionFromDatabase() {
-            List<TestQuestion> qs = testQuestionRepository.findAll();
+            List<Question> qs = questionRepository.findAll();
             questionNumber = GetMaxTestQuestion(); //初始化试题库中总题目数
-            for (TestQuestion question : qs) {
+            for (Question question : qs) {
                 TestQuestion q = new TestQuestion();
-                question.setId(question.id);
+                q.setId(question.getQuestion_id());
 
-                q.setKind(question.kind);
-                q.setHard(question.hard);
-                q.setDiff(question.diff);
-                q.setScore(question.score);
-                q.setChapter(question.chapter);
-                q.setImportance(question.importance);
+                q.setKind(question.getKind());
+                q.setHard(question.getHard());
+                q.setDiff(question.getDiff());
 
-                questions.add(question);
+                //选择判断题：原分数为1 - 15随机数，错的人多则加分，错的人少则减分
+                if (q.kind.equals(0) || q.kind.equals(1)) {
+                    q.setScore(myRand.nextInt(14) + 1);
+                }
+                else { //如果是简答/编程题，则为难度的40倍
+                    q.setScore((int) (q.hard*45));
+                }
+
+//                q.setScore(question.getS);
+                q.setChapter(question.getChapter());
+                q.setImportance(question.getImportance());
+
+                questions.add(q);
             }
         }
 
@@ -89,7 +99,7 @@ public class GeneOP_o
 
         //从数据库中得到最大的题目号（设定：题目不能删除）
         public int GetMaxTestQuestion() {
-            return testQuestionRepository.getMaxTestQuestionId();
+            return questionRepository.getMaxQuestionId();
         }
 
         //将初始化的随机题目存入数据库
@@ -97,10 +107,9 @@ public class GeneOP_o
             GetDatabaseForTest(); //初始化questions[]
 
             for (int i = 0; i < questionNumber; i++) {
-                TestQuestion q = new TestQuestion();
-                q.setId(i);
+                Question q = new Question();
+                q.setQuestion_id(i);
                 q.setKind(questions.get(i).kind);
-                q.setScore(questions.get(i).score);
                 q.setHard(questions.get(i).hard);
                 q.setDiff(questions.get(i).diff);
                 q.setChapter(questions.get(i).chapter);
@@ -109,7 +118,7 @@ public class GeneOP_o
                 q.setContent("question " + i);
                 q.setAnswer("answer " + i);
 
-                testQuestionRepository.save(q);
+                questionRepository.save(q);
             }
         }
 
