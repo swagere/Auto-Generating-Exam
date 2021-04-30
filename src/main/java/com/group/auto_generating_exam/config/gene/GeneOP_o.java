@@ -178,7 +178,6 @@ public class GeneOP_o
                     availableKindRange[n] = availableKindRange[nKind + 1];
                 }
             }
-            System.out.println(1);
         }
 
         //--低分辨率下的遗传算法---------------------------------------------
@@ -204,6 +203,7 @@ public class GeneOP_o
         public TestQuestion GetQuestionByOrder(int order) {
             return questions.get(order);
         }
+
     }
 
 
@@ -287,7 +287,8 @@ public class GeneOP_o
                     for (int k = 0; k < testKind[nKind]; k++) {
                         // 生成一套卷子
                         // 低分辨率下，随机生成每道题的编号，每道题的编号为类的编号
-                        chromosome[i][count ++] = database.GetRandQuestionClusterOrderByKind(nKind);
+                        int t = database.GetRandQuestionClusterOrderByKind(nKind);
+                        chromosome[i][count ++] = t;
                     }
                 }
             }
@@ -817,7 +818,6 @@ public class GeneOP_o
             calculateFitness_highResolution(); // 得到最好的结果的适应度
 
             GetResult(0);
-
 
             return chromosome[0];
         }

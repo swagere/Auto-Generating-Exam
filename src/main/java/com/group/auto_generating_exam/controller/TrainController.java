@@ -90,7 +90,7 @@ public class TrainController {
 
 
 //        score, diff, kind, hard, chap, impo
-        int[] questions = geneOP.generateTest(score, diff, kind, hard, chap, impo);
+        int[] ids = geneOP.generateTest(score, diff, kind, hard, chap, impo);
 
 
         //处理结果
@@ -107,13 +107,13 @@ public class TrainController {
         List r_9 = new ArrayList();
 
         for (int i = 0; i < count; i++) {
-            int id = questions[i];
+            int id = ids[i];
             Integer k = testQuestionRepository.getKindById(id);
             if (k.equals(0)) {
                 r_0.add(id);
             }
             else if (k.equals(1)) {
-                r_1.add(i);
+                r_1.add(id);
             }
             else if (k.equals(2)) {
                 r_2.add(id);
