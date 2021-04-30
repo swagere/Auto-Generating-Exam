@@ -3,10 +3,10 @@ package com.group.auto_generating_exam.controller;
 import com.alibaba.fastjson.JSON;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.gene.GeneOP_o;
-import com.group.auto_generating_exam.config.gene.GeneOP_oo;
 import com.group.auto_generating_exam.dao.TestQuestionRepository;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,11 +36,11 @@ public class TrainController {
 
 
     /**
+     * 强化训练
      * 组卷
-     * @return
      */
-    @RequestMapping("/generateTest")
-    public @ResponseBody AjaxResponse generateTest(@RequestBody String str, HttpServletRequest httpServletRequest) {
+    @RequestMapping("/IntensiveTrain")
+    public @ResponseBody AjaxResponse GenerateIntensiveTrain(@RequestBody String str, HttpServletRequest httpServletRequest) {
 //        BasicGene.IntelligentTestSystem intelligentTestSystem = new BasicGene.IntelligentTestSystem();
 //        intelligentTestSystem.Initial();
 //
@@ -50,17 +50,18 @@ public class TrainController {
 //            intelligentTestSystem.Generate();
 //        }
 
+        //输入参数
         int score = Integer.parseInt(JSON.parseObject(str).get("score").toString());
+        List kind_origin = ToolUtil.String2List(JSON.parseObject(str).get("kind").toString());
         double diff = Double.parseDouble(JSON.parseObject(str).get("diff").toString());
 
-        List kind_origin = ToolUtil.String2List(JSON.parseObject(str).get("kind").toString());
+        //生成参数
         List hard_origin = ToolUtil.String2List(JSON.parseObject(str).get("hard").toString());
         List chap_origin = ToolUtil.String2List(JSON.parseObject(str).get("chapter").toString());
         List impo_origin = ToolUtil.String2List(JSON.parseObject(str).get("importance").toString());
 
 
         //设置出题初始参数
-
         int[] kind = new int[50];
         int count = 0;
         for (int i = 0; i < kind_origin.size(); i++) {
@@ -100,11 +101,6 @@ public class TrainController {
         List r_2 = new ArrayList();
         List r_3 = new ArrayList();
         List r_4 = new ArrayList();
-        List r_5 = new ArrayList();
-        List r_6 = new ArrayList();
-        List r_7 = new ArrayList();
-        List r_8 = new ArrayList();
-        List r_9 = new ArrayList();
 
         for (int i = 0; i < count; i++) {
             int id = ids[i];
@@ -124,37 +120,23 @@ public class TrainController {
             else if (k.equals(4)) {
                 r_4.add(id);
             }
-            else if (k.equals(5)) {
-                r_5.add(id);
-            }
-            else if (k.equals(6)) {
-                r_6.add(id);
-            }
-            else if (k.equals(7)) {
-                r_7.add(id);
-            }
-            else if (k.equals(8)) {
-                r_8.add(id);
-            }
-            else if (k.equals(9)) {
-                r_9.add(id);
-            }
-
         }
         res.put("0",r_0);
         res.put("1",r_1);
         res.put("2",r_2);
         res.put("3",r_3);
         res.put("4",r_4);
-        res.put("5",r_5);
-        res.put("6",r_6);
-        res.put("7",r_7);
-        res.put("8",r_8);
-        res.put("9",r_9);
 
-
-//        geneOP.generateQuestion();
         return AjaxResponse.success(res);
+    }
+
+    /*
+     * 初始化数据库
+     */
+    @RequestMapping("/GenerateQuestion")
+    public @ResponseBody AjaxResponse GenerateQuestion() {
+        geneOP.generateQuestion();
+        return AjaxResponse.success();
     }
 
 }

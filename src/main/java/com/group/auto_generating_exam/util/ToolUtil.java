@@ -54,4 +54,18 @@ public class ToolUtil {
         }
         return 4;
     }
+
+    //string转listInt
+    public static ArrayList<Integer> String2ListInt(String s){
+        ArrayList<Integer> list = new ArrayList<>();
+        try{
+            JSONArray jsonArray = new JSONArray(s);
+            for(int i=0;i<jsonArray.length();++i){
+                list.add(Integer.valueOf(jsonArray.getString(i)));
+            }
+        }catch (Exception e){
+            //这里处理异常
+        }
+        return list;
+    }
 }

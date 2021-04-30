@@ -55,11 +55,11 @@ public class GeneOP_o
                 TestQuestion question = new TestQuestion();
                 question.setId(i);
 
-                question.setKind(myRand.nextInt(10));
+                question.setKind(myRand.nextInt(5));
                 question.setHard(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
                 question.setDiff(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
                 question.setScore(myRand.nextInt(19) + 1);
-                question.setChapter(myRand.nextInt(20));
+                question.setChapter(myRand.nextInt(10));
                 question.setImportance(myRand.nextInt(3));
 
                 questions.add(question);

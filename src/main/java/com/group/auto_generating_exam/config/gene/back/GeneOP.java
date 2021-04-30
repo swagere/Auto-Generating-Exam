@@ -1,4 +1,4 @@
-package com.group.auto_generating_exam.config.gene;
+package com.group.auto_generating_exam.config.gene.back;
 
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;

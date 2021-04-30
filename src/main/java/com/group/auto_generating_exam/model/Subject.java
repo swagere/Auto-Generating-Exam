@@ -30,16 +30,10 @@ public class Subject implements Serializable {
     private String description;
 
     @Column
-    private Integer stu_num;//时间戳
+    private Integer stu_num;
 
     @Column
-    private String outline;
-
-    @Column
-    private String outline_score;
-
-    @Column
-    private Integer question_kind_count;
+    private String chapter;
 
     @Column
     private Integer chapter_count;
