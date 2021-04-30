@@ -25,12 +25,12 @@ public class GeneOP
 
         int questionNumber = 0; //题库实际容量
 
-        List<TestQuestion> questions = new ArrayList<TestQuestion>(); //试题数组
+        List<TestQuestion> questions = new ArrayList<>(); //试题数组
 
 
-        public int availableClusterNumber = 0;  //试题类别数目
-        public TestQuestion[] availableCluster = new TestQuestion[maxNumber]; //试题类
-        public int[] availableKindRange = new int[20]; //题型范围
+        int availableClusterNumber = 0;  //试题类别数目
+        List<TestQuestion> availableCluster = new ArrayList<>(maxNumber); //试题类
+        int[] availableKindRange = new int[20]; //题型范围
 
         Date date=new Date();
         Random myRand = new Random(5 * (int) TimeUtils.getSecondTimestamp(date));
@@ -45,23 +45,23 @@ public class GeneOP
             return subject;
         }
 
-        //初始化questions[]
-//        public void GetDatabaseForTest() {
-//            questionNumber = 5000;
-//            for (int i = 0; i < questionNumber; i++) {
-//                TestQuestion question = new TestQuestion();
-//                question.setId(i);
-//
-//                question.setKind(myRand.nextInt(10));
-//                question.setHard(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
-//                question.setDiff(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
-//                question.setScore(myRand.nextInt(19) + 1);
-//                question.setChapter(myRand.nextInt(20));
-//                question.setImportance(myRand.nextInt(3));
-//
-//                questions.add(question);
-//            }
-//        }
+        //初始化生成questions[]
+        public void GetDatabaseForTest() {
+            questionNumber = 2000;
+            for (int i = 0; i < questionNumber; i++) {
+                TestQuestion question = new TestQuestion();
+                question.setId(i);
+
+                question.setKind(myRand.nextInt(10));
+                question.setHard(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
+                question.setDiff(Math.abs(myRand.nextInt(10)/10.0 - 0.01));
+                question.setScore(myRand.nextInt(19) + 1);
+                question.setChapter(myRand.nextInt(20));
+                question.setImportance(myRand.nextInt(3));
+
+                questions.add(question);
+            }
+        }
 
         //将从数据库中得到的question值赋给questions对象 并通过输入初始化分数
         public void GetTestQuestionFromDatabase() {
@@ -90,29 +90,26 @@ public class GeneOP
         }
 
         //将初始化的随机题目存入数据库
-//        public void GenerateQuestionDatabase() {
-//            GetDatabaseForTest(); //初始化questions[]
-//
-//            for (int i = 1380; i < questionNumber; i++) {
-//                TestQuestion q = new TestQuestion();
-//                q.setId(i);
-//                q.setKind(questions.get(i).kind);
-//                q.setScore(questions.get(i).score);
-//                q.setHard(questions.get(i).hard);
-//                q.setDiff(questions.get(i).diff);
-//                q.setChapter(questions.get(i).chapter);
-//                q.setImportance(questions.get(i).importance);
-//
-//                q.setContent("question " + i);
-//                q.setAnswer("answer " + i);
-//
-//                testQuestionRepository.save(q);
-//            }
-//        }
+        public void GenerateQuestionDatabase() {
+            GetDatabaseForTest(); //初始化questions[]
 
-        public void ConvertDatabase() {
-            //select one info???
+            for (int i = 0; i < questionNumber; i++) {
+                TestQuestion q = new TestQuestion();
+                q.setId(i);
+                q.setKind(questions.get(i).kind);
+                q.setScore(questions.get(i).score);
+                q.setHard(questions.get(i).hard);
+                q.setDiff(questions.get(i).diff);
+                q.setChapter(questions.get(i).chapter);
+                q.setImportance(questions.get(i).importance);
+
+                q.setContent("question " + i);
+                q.setAnswer("answer " + i);
+
+                testQuestionRepository.save(q);
+            }
         }
+
 
         //--遗传算法预处理-------------------------------------------------------
         // 排序 具体的试题
@@ -120,9 +117,7 @@ public class GeneOP
             for (int i = 0; i < questionNumber; i++) {
                 for (int j = 0; j < questionNumber - i - 1; j++) {
                     if (questions.get(j).Compare(questions.get(j + 1)) == 2) {
-                        TestQuestion t = questions.get(j);
-                        questions.set(j, questions.get(j + 1));
-                        questions.set(j + 1, t);
+                        Collections.swap(questions, j, j + 1);
                     }
                 }
             }
@@ -130,6 +125,7 @@ public class GeneOP
 
         // 试题预操作
         public void PreOperation() {
+
             SortQuestionByAttribute();
 
             // 初始化
@@ -145,30 +141,29 @@ public class GeneOP
             for (int i = 0; i < questionNumber; i++) {
                 if (firstTime == 0) {
                     // 如果是第一个 则初始化为一个类
-                    availableCluster[availableClusterNumber] = questions.get(i);
-                    availableCluster[availableClusterNumber].start = i;
-                    availableCluster[availableClusterNumber].count = 1;
+                    availableCluster.add(questions.get(i));
+                    availableCluster.get(availableClusterNumber).setStart(i);
+                    availableCluster.get(availableClusterNumber).setCount(1);
 
                     firstTime = 1;
                 }
                 else {
                     //比较当前的题是不是属于当前类
-                    if (availableCluster[availableClusterNumber].Compare(questions.get(i)) == 0) {
+                    if (availableCluster.get(availableClusterNumber).Compare(questions.get(i)) == 0) {
                         //如果是，则更新当前类
-//                        TestQuestion q = availableCluster[availableClusterNumber];
-                        availableCluster[availableClusterNumber].count++;
+                        TestQuestion q = availableCluster.get(availableClusterNumber);
+                        availableCluster.get(availableClusterNumber).setCount(availableCluster.get(availableClusterNumber).count++);
                     }
                     else {
                         // 如果不是，则添加新类
                         availableClusterNumber++;
-                        availableCluster[availableClusterNumber] = questions.get(i);
-
-                        availableCluster[availableClusterNumber].start = i;
-                        availableCluster[availableClusterNumber].count = 1;
+                        availableCluster.add(questions.get(i));
+                        availableCluster.get(availableClusterNumber).setStart(i);
+                        availableCluster.get(availableClusterNumber).setCount(1);
                     }
                 }
 
-                int nKind = availableCluster[availableClusterNumber].kind;
+                int nKind = availableCluster.get(availableClusterNumber).kind;
                 availableKindRange[nKind + 1] = availableClusterNumber;
                 for (int n = nKind + 1; n < 20; n++) {
                     availableKindRange[n] = availableKindRange[nKind + 1];
@@ -186,13 +181,13 @@ public class GeneOP
 
         //根据编号获得分类器
         public TestQuestion GetQuestionClusterByOrder(int order) {
-            return availableCluster[order];
+            return availableCluster.get(order);
         }
 
         //--高分辨率下的遗传算法------------------------------------
         //在同一类中获取其他题目
         public int GetRandQuestionOrderInSameCluster(int order) {
-            return myRand.nextInt(availableCluster[order].count) + availableCluster[order].start;
+            return myRand.nextInt(availableCluster.get(order).count) + availableCluster.get(order).start;
         }
 
         //根据序号获取题目
@@ -213,7 +208,7 @@ public class GeneOP
     public class IntelligentTestSystem {
 
         int population = 100;
-        int maxNumber = 200;
+        int maxNumber = 200; //一套试卷最多题目数
 
         QuestionDatabase database = new QuestionDatabase();
 
@@ -234,10 +229,11 @@ public class GeneOP
 
         Date date=new Date();
         Random myRand = new Random(5 * (int) TimeUtils.getSecondTimestamp(date));
+
         Logistic logistic1 = new Logistic();
         Logistic logistic2 = new Logistic();
 
-        public int SetPaperAttribute(int _score, double _diff, int[] _kind,int[] _hard, int[] _chap, int[] _impo) {
+        public void SetPaperAttribute(int _score, double _diff, int[] _kind,int[] _hard, int[] _chap, int[] _impo) {
             score = _score;
             diff = _diff;
             testKind = (int[]) _kind.clone();
@@ -246,7 +242,7 @@ public class GeneOP
             importanceDistribute = (int[]) _impo.clone();
 
             testNumber = 0;
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 10; i++) { //一共只有五种题
                 testNumber += testKind[i];
             }
 
@@ -255,21 +251,19 @@ public class GeneOP
             weight[2] = 1;
             weight[3] = 1;
             weight[4] = 1;
-
-            return 1;
         }
 
-        public List GetPaperAttribute() {
-            List out = new ArrayList();
-            out.add(score);
-            out.add(diff);
-            out.add((int[])testKind.clone());
-            out.add((int[])chapterDistribute.clone());
-            out.add((int[])importanceDistribute.clone());
-            out.add((int[])paperOrder.clone());
-
-            return out;
-        }
+//        public List GetPaperAttribute() {
+//            List out = new ArrayList();
+//            out.add(score);
+//            out.add(diff);
+//            out.add((int[])testKind.clone());
+//            out.add((int[])chapterDistribute.clone());
+//            out.add((int[])importanceDistribute.clone());
+//            out.add((int[])paperOrder.clone());
+//
+//            return out;
+//        }
 
         //--低分辨率下的遗传算法------------
         //初始化 生成试卷
@@ -344,7 +338,7 @@ public class GeneOP
         int DotProduct(int[] a, int[] b, int length) {
             int t = 0;
             for (int i = 0; i < length; i++) {
-                t += a[i] + b[i];
+                t += a[i] * b[i];
             }
             return t;
         }
@@ -387,6 +381,7 @@ public class GeneOP
                 int order = chromosome[n][i];
                 TestQuestion q = database.GetQuestionClusterByOrder(order);
 
+
                 int nScore = q.score;
                 thisDiff += q.score * q.diff;
 
@@ -402,7 +397,7 @@ public class GeneOP
             double[] error = new double[5];
 
             // 计算误差
-            error[0] = Math.abs(thisDiff /= thisScore);
+            error[0] = Math.abs((thisScore - score)/score);
             error[1] = 0;
             if (thisDiff < diff) {
                 error[1] = diff - thisDiff;
@@ -587,7 +582,7 @@ public class GeneOP
 
             for (int i = 0; i < testNumber; i++) {
                 int order = chromosome[n][i];
-                TestQuestion q = database.GetQuestionClusterByOrder(order);
+                TestQuestion q = database.GetQuestionByOrder(order);
 
                 int nScore = q.score;
                 thisDiff += q.score * q.diff;
@@ -756,10 +751,9 @@ public class GeneOP
             return 1;
         }
 
-        public int GeneratePaperDesign(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
-            //初始化处理
-            SetPaperAttribute(score, diff, kind, hard, chap, impo);
-//            database.GenerateQuestionDatabase();
+        public int[] GeneratePaperDesign(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
+            //--初始化处理------------------
+            SetPaperAttribute(score, diff, kind, hard, chap, impo); //设置参数
             database.GetTestQuestionFromDatabase(); // 从数据库中读取全部题目
 //            database.GetDatabaseForTest();
 
@@ -780,9 +774,11 @@ public class GeneOP
             for (int n = 0; n < population; n++) {
                 for (int i = 0; i < testNumber; i++) {
                     for (int j = 0; j < testNumber - i - 1; j++) {
-                        int t = chromosome[n][j + 1];
-                        chromosome[n][j + 1] = chromosome[n][j ];
-                        chromosome[n][j] = t;
+                        if (chromosome[n][j] > chromosome[n][j + 1]) {
+                            int t = chromosome[n][j];
+                            chromosome[n][j] = chromosome[n][j + 1];
+                            chromosome[n][j + 1] = t;
+                        }
                     }
                 }
             }
@@ -813,19 +809,26 @@ public class GeneOP
 
             GetResult(0);
 
-            System.out.println(Arrays.toString(chromosome[0]));
-
-            return 1;
+            return chromosome[0];
         }
 
+        public void generateQuestion() {
+            database.GenerateQuestionDatabase();
+        }
 
     }
 
-    public int generateTest(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
+    //组卷调用
+    public int[] generateTest(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
         IntelligentTestSystem intelligentTestSystem = new IntelligentTestSystem();
 
-
         return intelligentTestSystem.GeneratePaperDesign(score, diff, kind, hard, chap, impo);
+    }
+
+    //为某一门科目初始化试题
+    public void generateQuestion() {
+        IntelligentTestSystem intelligentTestSystem = new IntelligentTestSystem();
+        intelligentTestSystem.generateQuestion();
     }
 
 }

@@ -41,8 +41,6 @@ public class ExamController {
     @Autowired
     UserService userService;
     @Autowired
-    GeneOP_Origin geneOP;
-    @Autowired
     RedisUtils redisUtils;
 
 
@@ -88,37 +86,6 @@ public class ExamController {
         //获取该试卷题目列表
         Map questionList = examService.getExamQuestionList(exam_id, user_id);
         return AjaxResponse.success(questionList);
-    }
-
-
-    /**
-     * 组卷
-     * @return
-     */
-    @RequestMapping("/generateTest")
-    public @ResponseBody AjaxResponse generateTest() {
-//        BasicGene.IntelligentTestSystem intelligentTestSystem = new BasicGene.IntelligentTestSystem();
-//        intelligentTestSystem.Initial();
-//
-//        for (int epoch = 0; epoch < 1000; epoch++) {
-//            intelligentTestSystem.CalculateFitness();
-//            intelligentTestSystem.Sort();
-//            intelligentTestSystem.Generate();
-//        }
-
-
-        //设置出题初始参数
-        int score = 100;
-        double diff = 0.5;
-        int[] kind = {10,10,10,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-        int[] hard = {20,20,20,30,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-        int[] chap = {20,20,20,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-        int[] impo = {30,50,10,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-//        score, diff, kind, hard, chap, impo
-        int i = geneOP.generateTest(score, diff, kind, hard, chap, impo);
-
-        return AjaxResponse.success(i);
     }
 
 
@@ -489,10 +456,10 @@ public class ExamController {
 
 
             //如果是编程题
-            if (getQuestion.getKind().equals(4) || getQuestion.getKind().equals(5)) {
+            if (getQuestion.getKind().equals(3) || getQuestion.getKind().equals(4)) {
                 //去question类中找到type
                 int type = 0; //类型1:normal;类型2：special judge
-                if (getQuestion.getKind().equals(4)) {   //判断编程题目类型
+                if (getQuestion.getKind().equals(3)) {   //判断编程题目类型
                     type = 1;
                 } else {
                     type = 2;
@@ -502,13 +469,13 @@ public class ExamController {
         }
         else {
             //如果为修改 而且是编程题 删除之前的文件并重新创建
-            if (getQuestion.getKind().equals(4) || getQuestion.getKind().equals(5)) {
+            if (getQuestion.getKind().equals(3) || getQuestion.getKind().equals(4)) {
                 //删除
                 judgeService.deleteFile(getQuestion.getQuestion_id());
 
                 //再创建 去question类中找到type
                 int type = 0; //类型1:normal;类型2：special judge
-                if (getQuestion.getKind().equals(4)) {   //判断编程题目类型
+                if (getQuestion.getKind().equals(3)) {   //判断编程题目类型
                     type = 1;
                 } else {
                     type = 2;
@@ -519,7 +486,7 @@ public class ExamController {
 
         examService.saveQuestion(getQuestion);  //保存到question表
 
-        if (getQuestion.getKind().equals(4) || getQuestion.getKind().equals(5)) {
+        if (getQuestion.getKind().equals(3) || getQuestion.getKind().equals(4)) {
             judgeService.addTestCase(getQuestion);   //保存到test_case表
         }
         return AjaxResponse.success(question_id);

@@ -15,4 +15,7 @@ public interface TestQuestionRepository extends JpaRepository<TestQuestion, Inte
 
     @Query("select max(id) from TestQuestion ")
     Integer getMaxTestQuestionId();
+
+    @Query("select s.kind from TestQuestion s where s.id = ?1")
+    Integer getKindById(Integer id);
 }

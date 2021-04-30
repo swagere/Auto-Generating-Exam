@@ -16,11 +16,11 @@ import java.io.Serializable;
 @Table(name = "question")
 public class Question implements Serializable {
 //    public static enum QuestionType {
-//        Single,1
-//        Judge,2
-//        Discussion,3
-//        Normal_Program,4
-//        SpecialJudge_Program;5
+//        Single,0
+//        Judge,1
+//        Discussion,2
+//        Normal_Program,3
+//        SpecialJudge_Program;4
 //        }
 
     @Id

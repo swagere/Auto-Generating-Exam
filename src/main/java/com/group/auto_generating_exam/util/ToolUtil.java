@@ -44,11 +44,11 @@ public class ToolUtil {
     public static int String2KindInt(String s) {
         switch (s) {
             case "Single":
-                return 1;
+                return 0;
             case "Discussion":
                 return 2;
             case "Judge":
-                return 5;
+                return 1;
             case "Normal_Program":
                 return 3;
         }

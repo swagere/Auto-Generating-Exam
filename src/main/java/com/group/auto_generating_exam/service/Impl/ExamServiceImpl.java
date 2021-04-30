@@ -71,16 +71,16 @@ public class ExamServiceImpl implements ExamService {
 
                 //传到前端页面
                 GetExamQuestion getQuestion = new GetExamQuestion(question_id, question.getQuestion(), question.getOptions(), question.getKind(), question.getTip(),null, null);
-                if (question.getKind().equals(1)) {
+                if (question.getKind().equals(0)) {
                     singleList.add(getQuestion);
                 }
-                else if (question.getKind().equals(2)) {
+                else if (question.getKind().equals(1)) {
                     judgeList.add(getQuestion);
                 }
-                else if (question.getKind().equals(5)) {
+                else if (question.getKind().equals(2)) {
                     discussionList.add(getQuestion);
                 }
-                else if (question.getKind().equals(4) || question.getKind().equals(5)) {
+                else if (question.getKind().equals(3) || question.getKind().equals(4)) {
                     TestCase testCase = testCaseRepository.getTestCaseByQuestionId(question_id);
                     String input = testCase.getInput();
                     String output = testCase.getOutput();

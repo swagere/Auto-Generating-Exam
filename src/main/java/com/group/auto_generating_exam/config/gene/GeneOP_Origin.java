@@ -25,7 +25,7 @@ public class GeneOP_Origin
 
         int questionNumber = 0; //题库实际容量
 
-        List<TestQuestion> questions = new ArrayList<TestQuestion>(); //试题数组
+        List<TestQuestion> questions = new ArrayList<>(); //试题数组
 
 
         public int availableClusterNumber = 0;  //试题类别数目
@@ -130,6 +130,7 @@ public class GeneOP_Origin
 
         // 试题预操作
         public void PreOperation() {
+
             SortQuestionByAttribute();
 
             // 初始化
@@ -155,7 +156,7 @@ public class GeneOP_Origin
                     //比较当前的题是不是属于当前类
                     if (availableCluster[availableClusterNumber].Compare(questions.get(i)) == 0) {
                         //如果是，则更新当前类
-//                        TestQuestion q = availableCluster[availableClusterNumber];
+                        TestQuestion q = availableCluster[availableClusterNumber];
                         availableCluster[availableClusterNumber].count++;
                     }
                     else {
@@ -237,7 +238,7 @@ public class GeneOP_Origin
         Logistic logistic1 = new Logistic();
         Logistic logistic2 = new Logistic();
 
-        public int SetPaperAttribute(int _score, double _diff, int[] _kind,int[] _hard, int[] _chap, int[] _impo) {
+        public void SetPaperAttribute(int _score, double _diff, int[] _kind,int[] _hard, int[] _chap, int[] _impo) {
             score = _score;
             diff = _diff;
             testKind = (int[]) _kind.clone();
@@ -256,7 +257,6 @@ public class GeneOP_Origin
             weight[3] = 1;
             weight[4] = 1;
 
-            return 1;
         }
 
         public List GetPaperAttribute() {
@@ -344,7 +344,7 @@ public class GeneOP_Origin
         int DotProduct(int[] a, int[] b, int length) {
             int t = 0;
             for (int i = 0; i < length; i++) {
-                t += a[i] + b[i];
+                t += a[i] * b[i];
             }
             return t;
         }
@@ -402,7 +402,7 @@ public class GeneOP_Origin
             double[] error = new double[5];
 
             // 计算误差
-            error[0] = Math.abs(thisDiff /= thisScore);
+            error[0] = Math.abs((thisScore - score)/score);
             error[1] = 0;
             if (thisDiff < diff) {
                 error[1] = diff - thisDiff;
@@ -587,7 +587,7 @@ public class GeneOP_Origin
 
             for (int i = 0; i < testNumber; i++) {
                 int order = chromosome[n][i];
-                TestQuestion q = database.GetQuestionClusterByOrder(order);
+                TestQuestion q = database.GetQuestionByOrder(order);
 
                 int nScore = q.score;
                 thisDiff += q.score * q.diff;
@@ -756,10 +756,9 @@ public class GeneOP_Origin
             return 1;
         }
 
-        public int GeneratePaperDesign(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
+        public int[] GeneratePaperDesign(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
             //初始化处理
             SetPaperAttribute(score, diff, kind, hard, chap, impo);
-//            database.GenerateQuestionDatabase();
             database.GetTestQuestionFromDatabase(); // 从数据库中读取全部题目
 //            database.GetDatabaseForTest();
 
@@ -780,9 +779,11 @@ public class GeneOP_Origin
             for (int n = 0; n < population; n++) {
                 for (int i = 0; i < testNumber; i++) {
                     for (int j = 0; j < testNumber - i - 1; j++) {
-                        int t = chromosome[n][j + 1];
-                        chromosome[n][j + 1] = chromosome[n][j ];
-                        chromosome[n][j] = t;
+                        if (chromosome[n][j] > chromosome[n][j + 1]) {
+                            int t = chromosome[n][j];
+                            chromosome[n][j] = chromosome[n][j + 1];
+                            chromosome[n][j + 1] = t;
+                        }
                     }
                 }
             }
@@ -813,19 +814,27 @@ public class GeneOP_Origin
 
             GetResult(0);
 
-            System.out.println(Arrays.toString(chromosome[0]));
 
-            return 1;
+            return chromosome[0];
         }
 
+        public void generateQuestion() {
+            database.GenerateQuestionDatabase();
+        }
 
     }
 
-    public int generateTest(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
+    //组卷调用
+    public int[] generateTest(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
         IntelligentTestSystem intelligentTestSystem = new IntelligentTestSystem();
 
-
         return intelligentTestSystem.GeneratePaperDesign(score, diff, kind, hard, chap, impo);
+    }
+
+    //为某一门科目初始化试题
+    public void generateQuestion() {
+        IntelligentTestSystem intelligentTestSystem = new IntelligentTestSystem();
+        intelligentTestSystem.generateQuestion();
     }
 
 }
