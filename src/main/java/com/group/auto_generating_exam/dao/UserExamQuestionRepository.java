@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -58,4 +59,11 @@ public interface UserExamQuestionRepository extends JpaRepository<UserExamQuesti
     @Transactional
     @Query("update UserExamQuestion u set u.is_right = :is_right where u.question_id = :question_id and u.exam_id = :exam_id and u.user_id = :user_id")
     void saveIsRight(@Param("is_right") Integer is_right, @Param("question_id") Integer question_id, @Param("exam_id") Integer exam_id, @Param("user_id") Integer user_id);
+
+    @Query("select u.user_id from UserExamQuestion u where u.question_id = ?1 and u.exam_id = ?2")
+    List<Integer> getUserIdByQuestionIdAndExamId(Integer question_id, Integer exam_id);
+
+    @Query("select u.answer from UserExamQuestion u where u.question_id = ?1 and u.exam_id = ?2 and u.user_id = ?3")
+    String getAnswerById(Integer question_id, Integer exam_id, Integer user_id);
+
 }

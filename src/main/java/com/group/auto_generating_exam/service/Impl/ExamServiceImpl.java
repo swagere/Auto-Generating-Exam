@@ -1,5 +1,8 @@
 package com.group.auto_generating_exam.service.Impl;
 
+import com.group.auto_generating_exam.config.exception.AjaxResponse;
+import com.group.auto_generating_exam.config.exception.CustomException;
+import com.group.auto_generating_exam.config.exception.CustomExceptionType;
 import com.group.auto_generating_exam.dao.*;
 import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
@@ -43,6 +46,8 @@ public class ExamServiceImpl implements ExamService {
     RedisUtils redisUtils;
     @Resource
     private Mapper dozerMapper;
+    @Autowired
+    UserRepository userRepository;
 
 
     //获取试卷列表（学生开始答题）
@@ -343,6 +348,66 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public void saveExamQuestion(ExamQuestion examQuestion) {
         examQuestionRepository.save(examQuestion);
+    }
+
+    //获得学生问答题部分 老师判题
+    @Override
+    public Map getDiscussion(Integer exam_id) {
+        String progress_status = examIsProgressing(exam_id);
+        if (!progress_status.equals("over")) {
+            throw new CustomException(CustomExceptionType.USER_INPUT_ERROR, "该考试还未结束");
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        //获取exam_id对应的所有题目
+        List<Integer> questionIdList = examQuestionRepository.getQuestionIdListByExamId(exam_id);
+
+        //获取问答题
+        for (int i = 0; i < questionIdList.size(); i++) {
+            if (!questionRepository.getKindById(questionIdList.get(i)).equals(2)) {
+                questionIdList.remove(i);
+                i--;
+            }
+        }
+
+        if (questionIdList.isEmpty()) {
+            throw new CustomException(CustomExceptionType.USER_INPUT_ERROR, "无需阅卷 系统将自动评卷");
+        }
+
+        ArrayList<Map> questions = new ArrayList<>();
+        for (Integer question_id : questionIdList) {
+            Map<String, Object> question = new HashMap<>();
+            question.put("question_id", question_id);
+            question.put("question", questionRepository.getQuestionByQuestionId(question_id));
+            question.put("answer", questionRepository.findAnswerByQuestionId(question_id));
+            question.put("score", examQuestionRepository.getScoreByIds(question_id, exam_id));
+            questions.add(question);
+        }
+        result.put("question", questions);
+
+        //学生信息部分
+        List<Integer> stuIdList = userExamQuestionRepository.getUserIdByQuestionIdAndExamId(questionIdList.get(0), exam_id);
+        if (stuIdList == null || stuIdList.isEmpty()) {
+            return null;
+        }
+        ArrayList<Map> stu = new ArrayList<>();
+        for (Integer stu_id : stuIdList) {
+            Map<String, Object> stuExam = new HashMap<>();
+            stuExam.put("id",stu_id);
+            stuExam.put("name", userRepository.getNameByUserId(stu_id));
+            ArrayList<Map> ress = new ArrayList<>();
+            for (Integer question_id : questionIdList) {
+                Map<String, Object> res = new HashMap<>();
+                res.put("question_id", question_id);
+                res.put("answer", userExamQuestionRepository.getAnswerById(question_id, exam_id, stu_id));
+                ress.add(res);
+            }
+            stuExam.put("question", ress);
+            stu.add(stuExam);
+        }
+        result.put("stuInfo", stu);
+        return result;
     }
 }
 

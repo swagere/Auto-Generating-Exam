@@ -42,4 +42,5 @@ public interface ExamService {
     void saveIsRight(Integer is_right, Integer exam_id, Integer question_id, Integer user_id);
     Integer getExamQuestionScore(Integer question_id, Integer exam_id);
     void saveExamQuestion(ExamQuestion examQuestion);
+    Map getDiscussion(Integer exam_id);
 }

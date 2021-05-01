@@ -313,14 +313,6 @@ public class ExamController {
     }
 
     /**
-     * 老师添加试卷/修改试题
-     */
-//    @PostMapping("/saveQuestionToExam")
-//        public @ResponseBody AjaxResponse saveQuestionToExam(@RequestBody GetQuestion getQuestion, HttpServletRequest httpServletRequest) {
-//
-//    }
-
-    /**
      * 获取一个老师的某个科目下的所有试卷
      * @param str
      * @param httpServletRequest
@@ -550,5 +542,19 @@ public class ExamController {
             log.error(e.getMessage());
             return AjaxResponse.error(new CustomException(CustomExceptionType.SYSTEM_ERROR, e.getMessage()));
         }
+    }
+
+    /**
+     * 教师获取学生问答题部分
+     * @param str
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/getDiscussion")
+    public @ResponseBody AjaxResponse getDiscussion(@RequestBody String str, HttpServletRequest httpServletRequest) {
+//        authorityCheckService.checkTeacherAuthority(httpServletRequest.getSession().getAttribute("userInfo"));
+        Integer exam_id = Integer.parseInt(JSON.parseObject(str).get("exam_id").toString());
+        Map data = examService.getDiscussion(exam_id);
+        return AjaxResponse.success(data);
     }
 }
