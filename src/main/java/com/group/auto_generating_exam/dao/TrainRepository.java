@@ -22,4 +22,6 @@ public interface TrainRepository extends JpaRepository<Train, Integer> {
     @Query("update Train s set s.train_time = :train_time, s.user_id = :user_id, s.sub_id = :sub_id where s.train_id = :train_id")
     void updateUserIdSubIdAndTrainTimeByTrainId(@Param("user_id") Integer user_id, @Param("sub_id") String sub_id, @Param("train_time") Long train_time, @Param("train_id") Integer train_id);
 
+    @Query("select u from Train u where u.user_id = ?1")
+    List<Train> getTrainByUserId(Integer user_id);
 }

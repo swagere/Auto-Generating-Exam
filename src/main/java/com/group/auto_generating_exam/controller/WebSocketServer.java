@@ -252,7 +252,9 @@ public class WebSocketServer {
             }
             else {
                 result.put("type","60001");
-                result.put("message", "保存答题结果成功");
+                Long last_time = examService.getLastTime(exam_id);
+                Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
+                result.put("message", rest_time/1000);
             }
 
             sendMessage(session, result);

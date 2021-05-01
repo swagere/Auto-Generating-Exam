@@ -146,4 +146,14 @@ public class TrainController {
         return AjaxResponse.success();
     }
 
+    /**
+     * 获得历史组卷信息
+     *
+     */
+    @RequestMapping("/getAllTrain")
+    public @ResponseBody AjaxResponse getAllTrain(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        Integer user_id = Integer.parseInt(JSON.parseObject(str).get("user_id").toString());
+        return AjaxResponse.success(trainService.getAllTrain(user_id));
+    }
+
 }

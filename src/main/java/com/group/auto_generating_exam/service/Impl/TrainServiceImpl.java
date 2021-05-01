@@ -1,6 +1,7 @@
 package com.group.auto_generating_exam.service.Impl;
 
 import com.group.auto_generating_exam.dao.*;
+import com.group.auto_generating_exam.model.Train;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.TrainService;
 import com.group.auto_generating_exam.util.ToolUtil;
@@ -8,7 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -176,6 +180,22 @@ public class TrainServiceImpl implements TrainService {
         return userTrainQuestionRepository.getQuestionIdByTrainId(train_id);
     }
 
+    //获得一个用户所有train试卷
+    @Override
+    public List<Train> getAllTrain(Integer user_id) {
+        List<Train> trains = trainRepository.getTrainByUserId(user_id);
+        List res = new ArrayList();
+        for (Train train : trains) {
+            Map m = new HashMap();
+            m.put("train_id", train.getTrain_id());
+            m.put("train_name", train.getTrain_name());
+            m.put("train_type", train.getTrain_type());
+            m.put("train_time", train.getTrain_time());
+
+            res.add(m);
+        }
+        return res;
+    }
 
 
 }

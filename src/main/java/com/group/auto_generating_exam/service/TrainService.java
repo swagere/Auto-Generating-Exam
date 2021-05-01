@@ -1,5 +1,7 @@
 package com.group.auto_generating_exam.service;
 
+import com.group.auto_generating_exam.model.Train;
+
 import java.util.List;
 import java.util.Map;
 
@@ -14,4 +16,5 @@ public interface TrainService {
     double[] getImportanceRatio(String sub_id, Integer user_id);
     void saveUserIdSubIdAndTrainTimeByTrainId (Integer user_id, String sub_id, Long train_time, Integer train_id);
     List<Integer> getQuestionIdByTrainId(Integer train_id);
+    List<Train> getAllTrain(Integer user_id);
 }
