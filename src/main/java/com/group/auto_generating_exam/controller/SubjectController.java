@@ -116,4 +116,18 @@ public class SubjectController {
         return AjaxResponse.success(res);
     }
 
+    /**
+     * 获得一门课的知识点
+     * @param str
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/getSubjectChapter")
+    public @ResponseBody AjaxResponse getSubjectChapter(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        String sub_id = JSON.parseObject(str).get("sub_id").toString();
+
+        return AjaxResponse.success(subjectService.getChapterNameBySubId(sub_id));
+    }
+
+
 }

@@ -37,4 +37,7 @@ public class Subject implements Serializable {
 
     @Column
     private String chapter_count;
+
+    @Column
+    private String chapter_name;
 }

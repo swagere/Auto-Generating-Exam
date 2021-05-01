@@ -66,5 +66,11 @@ public class SubjectServiceImpl implements SubjectService {
     public Subject getSubjectBySubjectId(String sub_id) {
         return subjectRepository.getSubjectBySubId(sub_id);
     }
+
+    //根据sub_id获取chapter
+    @Override
+    public String getChapterNameBySubId(String sub_id) {
+        return subjectRepository.getChapterNameBySubId(sub_id);
+    }
 }
 
