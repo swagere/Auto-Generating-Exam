@@ -61,9 +61,9 @@ public class TrainController {
         double diff = Double.parseDouble(JSON.parseObject(str).get("diff").toString());
 
         //生成参数
-        List hard_origin = ToolUtil.String2List(JSON.parseObject(str).get("hard").toString());
+        double[] hard_origin = trainService.getHardRatio(sub_id, user_id);
         double[] chap_origin = trainService.getChapterRatio(sub_id, user_id);
-        List impo_origin = ToolUtil.String2List(JSON.parseObject(str).get("importance").toString());
+        double[] impo_origin = trainService.getImportanceRatio(sub_id, user_id);
 
 
         //设置出题初始参数
@@ -75,8 +75,8 @@ public class TrainController {
         }
 
         int[] hard = new int[50];
-        for (int i = 0; i < hard_origin.size(); i++) {
-            hard[i] = Integer.parseInt((String) hard_origin.get(i));
+        for (int i = 0; i < hard_origin.length; i++) {
+            hard[i] = (int) hard_origin[i] * 100;
         }
 
         int[] chap = new int[50];
@@ -85,8 +85,8 @@ public class TrainController {
         }
 
         int[] impo = new int[50];
-        for (int i = 0; i < impo_origin.size(); i++) {
-            impo[i] = Integer.parseInt((String) impo_origin.get(i));
+        for (int i = 0; i < impo_origin.length; i++) {
+            impo[i] = (int) impo_origin[i] * 100;
         }
 
 //        int[] kind = {10,10,10,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};

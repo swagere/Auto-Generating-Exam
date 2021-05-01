@@ -18,4 +18,16 @@ public interface UserSubjectRepository extends JpaRepository<UserSubject, UserSu
 
     @Query("select s.chapter_count from UserSubject s where s.sub_id=?1 and s.user_id=?2")
     String getChapterCount(String Sub_id, Integer user_id);
+
+    @Query("select s.hard_right_count from UserSubject s where s.sub_id=?1 and s.user_id=?2")
+    String getHardRightCount(String Sub_id, Integer user_id);
+
+    @Query("select s.hard_count from UserSubject s where s.sub_id=?1 and s.user_id=?2")
+    String getHardCount(String Sub_id, Integer user_id);
+
+    @Query("select s.importance_right_count from UserSubject s where s.sub_id=?1 and s.user_id=?2")
+    String getImportanceRightCount(String Sub_id, Integer user_id);
+
+    @Query("select s.importance_count from UserSubject s where s.sub_id=?1 and s.user_id=?2")
+    String getImportanceCount(String Sub_id, Integer user_id);
 }

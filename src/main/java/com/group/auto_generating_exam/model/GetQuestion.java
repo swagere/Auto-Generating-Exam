@@ -20,6 +20,7 @@ public class GetQuestion implements Serializable {
     private String sub_id;
     private String options;
     private String answer;
+    private Integer exam_id;
 
     private Integer kind;
 
@@ -34,4 +35,6 @@ public class GetQuestion implements Serializable {
     private Integer importance;
 
     private Integer chapter;
+
+    private Integer score;
 }

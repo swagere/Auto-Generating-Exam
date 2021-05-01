@@ -340,5 +340,10 @@ public class ExamServiceImpl implements ExamService {
     public Integer getExamQuestionScore(Integer question_id, Integer exam_id) {
         return examQuestionRepository.getScoreByIds(question_id, exam_id);
     }
+
+    @Override
+    public void saveExamQuestion(ExamQuestion examQuestion) {
+        examQuestionRepository.save(examQuestion);
+    }
 }
 

@@ -27,4 +27,16 @@ public class UserSubject implements Serializable {
 
     @Column
     private String chapter_count;
+
+    @Column
+    private String hard_right_count;
+
+    @Column
+    private String hard_count;
+
+    @Column
+    private String importance_right_count;
+
+    @Column
+    private String importance_count;
 }

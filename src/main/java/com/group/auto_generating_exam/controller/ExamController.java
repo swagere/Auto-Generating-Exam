@@ -435,9 +435,15 @@ public class ExamController {
 
     /**
      * 老师出题
+     * 保存到question test_case exam_question
      */
     @PostMapping("/saveQuestion")
     public @ResponseBody AjaxResponse getStuAllExam(@Valid @RequestBody GetQuestion getQuestion, HttpServletRequest httpServletRequest) throws Exception {
+        //加入sub_id
+        Integer exam_id = getQuestion.getExam_id();
+        String sub_id = examService.getSubIdByExamId(exam_id);
+        getQuestion.setSub_id(sub_id);
+
         //先判断是否为添加题目
         Integer question_id = getQuestion.getQuestion_id();
         Future<String> future = null;
@@ -487,6 +493,14 @@ public class ExamController {
         if (getQuestion.getKind().equals(3) || getQuestion.getKind().equals(4)) {
             judgeService.addTestCase(getQuestion);   //保存到test_case表
         }
+
+        //保存到exam_question
+        ExamQuestion examQuestion = new ExamQuestion();
+        examQuestion.setExam_id(exam_id);
+        examQuestion.setQuestion_id(question_id);
+        examQuestion.setScore(getQuestion.getScore());
+        examService.saveExamQuestion(examQuestion);
+
         return AjaxResponse.success(question_id);
     }
 

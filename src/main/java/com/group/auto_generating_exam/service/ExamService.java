@@ -1,6 +1,7 @@
 package com.group.auto_generating_exam.service;
 
 import com.group.auto_generating_exam.model.Exam;
+import com.group.auto_generating_exam.model.ExamQuestion;
 import com.group.auto_generating_exam.model.GetQuestion;
 import com.group.auto_generating_exam.model.UserExamQuestion;
 
@@ -41,4 +42,5 @@ public interface ExamService {
     void judgeGeneralQuestion(Integer exam_id);
     void saveIsRight(Integer is_right, Integer exam_id, Integer question_id, Integer user_id);
     Integer getExamQuestionScore(Integer question_id, Integer exam_id);
+    void saveExamQuestion(ExamQuestion examQuestion);
 }
