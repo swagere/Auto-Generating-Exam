@@ -4,17 +4,16 @@ import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
 import com.group.auto_generating_exam.dao.QuestionRepository;
 import com.group.auto_generating_exam.dao.SubjectRepository;
-import com.group.auto_generating_exam.model.Question;
-import com.group.auto_generating_exam.model.Subject;
-import com.group.auto_generating_exam.model.TestQuestion;
+import com.group.auto_generating_exam.dao.TrainQuestionRepository;
+import com.group.auto_generating_exam.dao.TrainRepository;
+import com.group.auto_generating_exam.model.*;
+import com.group.auto_generating_exam.util.RedisUtils;
 import com.group.auto_generating_exam.util.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class GeneOP_o
@@ -23,6 +22,12 @@ public class GeneOP_o
     SubjectRepository subjectRepository;
     @Autowired
     QuestionRepository questionRepository;
+    @Autowired
+    TrainRepository trainRepository;
+    @Autowired
+    RedisUtils redisUtils;
+    @Autowired
+    TrainQuestionRepository trainQuestionRepository;
 
     public class QuestionDatabase {
         int maxNumber = 10000;  //题库最大容量
@@ -731,11 +736,10 @@ public class GeneOP_o
         }
 
         //--遗传算法------------
-        public double GetResult(int n) {
+        public Integer GetResult(int n) {
             int[] thisHardDistribute = new int[5]; //实际难度分布
             int[] thisChapterDistribute = new int[20]; //实际章节分布
             int[] thisImportanceDistribute = new int[5]; //实际重要性分布
-
 
             double thisDiff = 0;
             double thisScore = 0;
@@ -767,10 +771,40 @@ public class GeneOP_o
             chapterDistribute = (int[])thisChapterDistribute.clone();
             importanceDistribute = (int[])thisImportanceDistribute.clone();
 
-            return 1;
+            //--保存到train中--------------------------------
+            Train train = new Train();
+
+            Integer train_id = redisUtils.incr("exam_id");
+            //判断redis的train_id值是否为目前数据库最大
+            Integer max = trainRepository.getMaxTrainId();
+            if (max != null && max >= train_id) {
+                train_id = max + 1;
+                redisUtils.set("exam_id", max + 1);
+            }
+
+            train.setTrain_id(train_id);
+            train.setTrain_type(0);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            train.setTrain_name(sdf.format(new Date()));
+            train.setHard_distribute(Arrays.toString(hardDistribute));
+            train.setChapter_distribute(Arrays.toString(chapterDistribute));
+            train.setImportance_distribute(Arrays.toString(importanceDistribute));
+            train.setDiff(diff);
+            train.setScore(score);
+
+            trainRepository.save(train);
+
+            //--保存到user_train_question中--------------------------------
+            for (int i : chromosome[0]) {
+                TrainQuestion trainQuestion = new TrainQuestion(train_id, i, null, 0, 0);
+                trainQuestionRepository.save(trainQuestion);
+            }
+
+            return train_id;
         }
 
-        public int[] GeneratePaperDesign(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
+        public Integer GeneratePaperDesign(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
             //初始化处理
             SetPaperAttribute(score, diff, kind, hard, chap, impo);
             database.GetTestQuestionFromDatabase(); // 从数据库中读取全部题目
@@ -826,9 +860,7 @@ public class GeneOP_o
 
             calculateFitness_highResolution(); // 得到最好的结果的适应度
 
-            GetResult(0);
-
-            return chromosome[0];
+            return GetResult(0); //得到组卷参数，保存到数据库
         }
 
         public void generateQuestion() {
@@ -838,7 +870,7 @@ public class GeneOP_o
     }
 
     //组卷调用
-    public int[] generateTest(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
+    public Integer generateTest(int score, double diff, int[] kind,int[] hard, int[] chap, int[] impo) {
         IntelligentTestSystem intelligentTestSystem = new IntelligentTestSystem();
 
         return intelligentTestSystem.GeneratePaperDesign(score, diff, kind, hard, chap, impo);

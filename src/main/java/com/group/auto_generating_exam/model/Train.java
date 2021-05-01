@@ -25,14 +25,34 @@ public class Train implements Serializable {
     private Integer train_id;
 
     @Column
-    private String train_name;
+    private Integer train_type;
 
     @Column
-    private String sub_id;
+    private String train_name;
 
     @Column
     private Long train_time;
 
     @Column
-    private Integer train_type;
+    private String sub_id;
+
+    @Column
+    private Integer user_id;
+
+    @Column
+    private String hard_distribute;
+
+    @Column
+    private String chapter_distribute;
+
+    @Column
+    private String importance_distribute;
+
+    @Column
+    private Double diff;
+
+    @Column
+    private Integer score;
+
+
 }

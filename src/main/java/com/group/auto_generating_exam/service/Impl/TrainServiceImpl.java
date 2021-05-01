@@ -1,21 +1,14 @@
 package com.group.auto_generating_exam.service.Impl;
 
 import com.group.auto_generating_exam.dao.*;
-import com.group.auto_generating_exam.model.Question;
-import com.group.auto_generating_exam.model.UserExamQuestion;
-import com.group.auto_generating_exam.model.UserTrainQuestion;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.TrainService;
-import com.group.auto_generating_exam.service.UserService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -38,7 +31,7 @@ public class TrainServiceImpl implements TrainService {
     @Autowired
     QuestionRepository questionRepository;
     @Autowired
-    UserTrainQuestionRepository userTrainQuestionRepository;
+    TrainQuestionRepository userTrainQuestionRepository;
     @Autowired
     UserSubjectRepository userSubjectRepository;
 
@@ -72,8 +65,8 @@ public class TrainServiceImpl implements TrainService {
 //
 //        //获取userTrainQuestion
 //        for (Integer id : trainIds) {
-//            List<UserTrainQuestion> userTrainQuestions = userTrainQuestionRepository.getUserTrainQuestion(id, user_id);
-//            for (UserTrainQuestion userTrainQuestion : userTrainQuestions) {
+//            List<TrainQuestion> userTrainQuestions = userTrainQuestionRepository.getUserTrainQuestion(id, user_id);
+//            for (TrainQuestion userTrainQuestion : userTrainQuestions) {
 //                Integer question_id = userTrainQuestion.getQuestion_id();
 //
 //                Map temp = new HashMap();
@@ -121,7 +114,8 @@ public class TrainServiceImpl implements TrainService {
             sum = sum + chapter_ratio[i];
         }
         for (int i = 0; i < chapter_count.size(); i++) {
-            chapter_ratio[i] = (chapter_ratio[i] / sum) * 0.4 + (double)origin_chapter_count.get(i) * 0.6;
+//            chapter_ratio[i] = (chapter_ratio[i] / sum) * 0.4 + (double)origin_chapter_count.get(i) * 0.6;
+            chapter_ratio[i] = chapter_ratio[i] / sum;
         }
 
         return chapter_ratio;
@@ -169,6 +163,20 @@ public class TrainServiceImpl implements TrainService {
 
         return impo_ratio;
     }
+
+    //更新sub_id user_id train_time
+    @Override
+    public void saveUserIdSubIdAndTrainTimeByTrainId (Integer user_id, String sub_id, Long train_time, Integer train_id) {
+        trainRepository.updateUserIdSubIdAndTrainTimeByTrainId(user_id, sub_id, train_time, train_id);
+    }
+
+    //根train_id获得question_ids
+    @Override
+    public List<Integer> getQuestionIdByTrainId(Integer train_id) {
+        return userTrainQuestionRepository.getQuestionIdByTrainId(train_id);
+    }
+
+
 
 }
 

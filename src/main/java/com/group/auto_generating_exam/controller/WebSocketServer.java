@@ -225,9 +225,12 @@ public class WebSocketServer {
 
             Integer error = 0;
             for (Object q : questions) {
-                Map question = JSONObject.parseObject(JSONObject.toJSONString(q), Map.class);
+                System.out.println(type);
+                Map question = JSONObject.parseObject(JSON.toJSONString(q));
+                System.out.println("1");
                 Integer question_id = Integer.valueOf(String.valueOf(question.get("question_id")));
                 String answer = String.valueOf(question.get("answer"));
+
 
                 Integer score = 0;
                 if (question.get("score") != null) {
@@ -253,7 +256,6 @@ public class WebSocketServer {
                 result.put("type","60001");
                 result.put("message", "保存答题结果成功");
             }
-
 
             sendMessage(session, result);
         }

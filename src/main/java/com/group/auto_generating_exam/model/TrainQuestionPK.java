@@ -5,8 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class UserTrainQuestionPK implements Serializable {
-    private Integer exam_id;
+public class TrainQuestionPK implements Serializable {
+    private Integer train_id;
     private Integer question_id;
-    private Integer user_id;
 }

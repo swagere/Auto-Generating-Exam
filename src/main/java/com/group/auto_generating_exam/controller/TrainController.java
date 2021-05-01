@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.gene.GeneOP_o;
 import com.group.auto_generating_exam.dao.QuestionRepository;
-import com.group.auto_generating_exam.model.Question;
 import com.group.auto_generating_exam.service.TrainService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -54,6 +50,7 @@ public class TrainController {
 
         String sub_id = JSON.parseObject(str).get("sub_id").toString();
         Integer user_id = Integer.parseInt(JSON.parseObject(str).get("user_id").toString());
+        Long train_time = Long.parseLong(JSON.parseObject(str).get("train_time").toString());
 
         //输入参数
         int score = Integer.parseInt(JSON.parseObject(str).get("score").toString());
@@ -76,30 +73,36 @@ public class TrainController {
 
         int[] hard = new int[50];
         for (int i = 0; i < hard_origin.length; i++) {
-            hard[i] = (int) hard_origin[i] * 100;
+            hard[i] = (int)(hard_origin[i] * 100);
         }
 
         int[] chap = new int[50];
         for (int i = 0; i < chap_origin.length; i++) {
-            chap[i] = (int) chap_origin[i] * 100;
+            chap[i] = (int)(chap_origin[i] * 100);
         }
 
         int[] impo = new int[50];
         for (int i = 0; i < impo_origin.length; i++) {
-            impo[i] = (int) impo_origin[i] * 100;
+            impo[i] = (int)(impo_origin[i] * 100);
         }
 
-//        int[] kind = {10,10,10,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-//        int[] hard = {20,20,20,30,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-//        int[] chap = {20,20,20,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-//        int[] impo = {30,50,10,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+//        int[] kinds = {10,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+//        int[] hards = {20,20,20,30,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+//        int[] chaps = {20,20,20,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+//        int[] impos = {30,50,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 
 //        score, diff, kind, hard, chap, impo
-        int[] ids = geneOP.generateTest(score, diff, kind, hard, chap, impo);
+        Integer train_id = geneOP.generateTest(score, diff, kind, hard, chap, impo);
 
 
-        //处理结果
+        //--将user_id train_time(分钟) sub_id保存到train中-------------
+        trainService.saveUserIdSubIdAndTrainTimeByTrainId(user_id, sub_id, train_time*1000*60, train_id);
+
+        //得到question列表返回给前端
+        List<Integer> question_ids = trainService.getQuestionIdByTrainId(train_id);
+
+
         Map res = new HashMap();
         List r_0 = new ArrayList();
         List r_1 = new ArrayList();
@@ -107,23 +110,22 @@ public class TrainController {
         List r_3 = new ArrayList();
         List r_4 = new ArrayList();
 
-        for (int i = 0; i < count; i++) {
-            int id = ids[i];
-            Integer k = questionRepository.getKindById(id);
+        for (Integer question_id : question_ids) {
+            Integer k = questionRepository.getKindById(question_id);
             if (k.equals(0)) {
-                r_0.add(id);
+                r_0.add(question_id);
             }
             else if (k.equals(1)) {
-                r_1.add(id);
+                r_1.add(question_id);
             }
             else if (k.equals(2)) {
-                r_2.add(id);
+                r_2.add(question_id);
             }
             else if (k.equals(3)) {
-                r_3.add(id);
+                r_3.add(question_id);
             }
             else if (k.equals(4)) {
-                r_4.add(id);
+                r_4.add(question_id);
             }
         }
         res.put("0",r_0);

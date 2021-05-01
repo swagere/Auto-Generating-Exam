@@ -11,13 +11,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "userTrain_question")
-@IdClass(UserTrainQuestion.class)
-public class UserTrainQuestion implements Serializable {
-    @Id
-    @Column
-    private Integer user_id;
-
+@Table(name = "train_question")
+@IdClass(TrainQuestionPK.class)
+public class TrainQuestion implements Serializable {
     @Id
     @Column
     private Integer train_id;

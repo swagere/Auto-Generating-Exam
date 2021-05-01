@@ -243,7 +243,6 @@ public class ExamServiceImpl implements ExamService {
                 exam_id = max + 1;
                 redisUtils.set("exam_id", max + 1);
             }
-            System.out.println(exam_id);
             exam.setExam_id(exam_id);
             examRepository.save(exam);
             return exam_id;

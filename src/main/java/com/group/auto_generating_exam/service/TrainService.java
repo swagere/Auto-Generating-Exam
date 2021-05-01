@@ -1,5 +1,6 @@
 package com.group.auto_generating_exam.service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,4 +12,6 @@ public interface TrainService {
     double[] getChapterRatio(String sub_id, Integer user_id);
     double[] getHardRatio(String sub_id, Integer user_id);
     double[] getImportanceRatio(String sub_id, Integer user_id);
+    void saveUserIdSubIdAndTrainTimeByTrainId (Integer user_id, String sub_id, Long train_time, Integer train_id);
+    List<Integer> getQuestionIdByTrainId(Integer train_id);
 }
