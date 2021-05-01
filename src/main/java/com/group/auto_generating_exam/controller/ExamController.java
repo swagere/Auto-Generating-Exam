@@ -276,7 +276,6 @@ public class ExamController {
 
         //可以停止该考生考试
         for (Integer question_id : questionIds) {
-            System.out.println(question_id);
             examService.saveIsCommit(1, question_id, exam_id, user_id);
         }
 
@@ -517,7 +516,18 @@ public class ExamController {
             Integer stu_id = req.getStu_id();
             Integer exam_id = req.getExam_id();
             for (UserExamQuestion stuExam: req.getScoreList()) {
-                examService.saveUserExamQuestionScore(stuExam.getScore(), stuExam.getQuestion_id(), exam_id, stu_id);
+                Integer question_id = stuExam.getQuestion_id();
+                examService.saveUserExamQuestionScore(stuExam.getScore(), question_id, exam_id, stu_id);
+                Integer origin_score = examService.getExamQuestionScore(question_id, exam_id);
+                if (stuExam.getScore().equals(origin_score)) {
+                    examService.saveIsRight(2, question_id, exam_id, stu_id);
+                }
+                else if (stuExam.getScore().equals(0)) {
+                    examService.saveIsRight(0, question_id, exam_id, stu_id);
+                }
+                else  {
+                    examService.saveIsRight(1, question_id, exam_id, stu_id);
+                }
             }
 
             examService.saveUserExamQuestionIsJudge(exam_id, 1);

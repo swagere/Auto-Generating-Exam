@@ -15,7 +15,7 @@ public class GetQuestion implements Serializable {
 
     private Integer question_id;
 
-    private String question;
+    private String content;
     private Integer user_id;
     private String sub_id;
     private String options;

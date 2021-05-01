@@ -22,4 +22,9 @@ public class UserSubject implements Serializable {
     @Column
     private String sub_id;
 
+    @Column
+    private String chapter_right_count;
+
+    @Column
+    private String chapter_count;
 }

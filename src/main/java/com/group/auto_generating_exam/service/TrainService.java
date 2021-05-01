@@ -8,5 +8,5 @@ import java.util.Map;
  */
 
 public interface TrainService {
-    Map generateTrain(String sub_id, Integer user_id);
+    double[] getChapterRatio(String sub_id, Integer user_id);
 }

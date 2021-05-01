@@ -286,6 +286,8 @@ public class ExamServiceImpl implements ExamService {
     public long saveQuestion(GetQuestion getQuestion) throws Exception {
         //将getQuestion类转化为question类
         Question question = dozerMapper.map(getQuestion, Question.class);
+        question.setRight_num(1);
+        question.setSum_num(1);
         questionRepository.save(question);
         return question.getQuestion_id();
     }
@@ -306,6 +308,37 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public void saveUserExamQuestionIsJudge(Integer exam_id, int flag) {
         userExamQuestionRepository.saveIsJudge(exam_id, flag);
+    }
+
+    //所有学生选择题判断题 判分 并保存结果（exam/UserExamQuestion）【计算right_ratio并一起存入数据库】
+    @Override
+    public void judgeGeneralQuestion(Integer exam_id) {
+//        ArrayList<StuExam> stuExams = stuExamRepository.getByExam_id(exam_id);
+//        for (StuExam stuExam : stuExams) {
+//            if (!stuExam.getType().equals(Question.Type.Single) && !stuExam.getType().equals(Question.Type.Judge)) {
+//                continue;
+//            }
+//            long question_id = stuExam.getQuestion_id();
+//            if (stuExam.getAnswer() != null && stuExam.getAnswer().equals(questionRepository.findAnswerById(question_id))){
+//                stuExam.setScore(examQuestionRepository.findScoreById(question_id, exam_id));
+//            } else {
+//                stuExam.setScore(0);
+//            }
+//            stuExamRepository.saveScore(stuExam.getScore(),stuExam.getQuestion_id(),stuExam.getExam_id(),stuExam.getStu_id());
+//        }
+//
+    }
+
+    //存入试卷的每一道题的is_right
+    @Override
+    public void saveIsRight(Integer is_right, Integer question_id, Integer exam_id, Integer user_id) {
+        userExamQuestionRepository.saveIsRight(is_right, question_id, exam_id, user_id);
+    }
+
+    //获取每道题的原来的分数
+    @Override
+    public Integer getExamQuestionScore(Integer question_id, Integer exam_id) {
+        return examQuestionRepository.getScoreByIds(question_id, exam_id);
     }
 }
 

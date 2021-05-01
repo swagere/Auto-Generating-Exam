@@ -11,7 +11,18 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("select max(question_id) from Question ")
     Integer getMaxQuestionId();
 
-
-    @Query("select s.kind from Question s where s.id = ?1")
+    @Query("select s.kind from Question s where s.question_id = ?1")
     Integer getKindById(Integer id);
+
+    @Query("select s.answer from Question s where s.question_id = ?1")
+    String findAnswerByQuestionId(Integer question_id);
+
+    @Query("select s.chapter from Question s where s.question_id = ?1")
+    Integer getChapterById(Integer id);
+
+    @Query("select s.importance from Question s where s.question_id = ?1")
+    Integer getImportanceById(Integer id);
+
+    @Query("select s.hard from Question s where s.question_id = ?1")
+    Double getHardById(Integer id);
 }

@@ -7,6 +7,7 @@ import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
 import com.group.auto_generating_exam.model.Exam;
 import com.group.auto_generating_exam.model.Question;
+import com.group.auto_generating_exam.model.UserExamQuestion;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -269,6 +270,9 @@ public class WebSocketServer {
         result.put("type", "30001");
         result.put("message", 0);
 
+
+        //所有同学选择填空评分 并存入数据库 如果没有简答题则设置is_judge（exam/UserExamQuestion）
+
         //广播出去
         broadCastInfo(result);
     }
@@ -293,6 +297,8 @@ public class WebSocketServer {
      *
      */
     public static void socketFinishExam(Integer exam_id) throws IOException {
+
+        //所有同学选择填空评分 并存入数据库 如果没有简答题则设置is_judge（exam/UserExamQuestion）
     }
 
 } 

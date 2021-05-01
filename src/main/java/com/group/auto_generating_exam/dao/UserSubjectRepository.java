@@ -12,4 +12,10 @@ import org.springframework.stereotype.Repository;
 public interface UserSubjectRepository extends JpaRepository<UserSubject, UserSubjectPK> {
     @Query("select s from UserSubject s where s.sub_id=?1 and s.user_id=?2")
     UserSubject getOneBySubIdAndUserId(String Sub_id, Integer user_id);
+
+    @Query("select s.chapter_right_count from UserSubject s where s.sub_id=?1 and s.user_id=?2")
+    String getChapterRightCount(String Sub_id, Integer user_id);
+
+    @Query("select s.chapter_count from UserSubject s where s.sub_id=?1 and s.user_id=?2")
+    String getChapterCount(String Sub_id, Integer user_id);
 }

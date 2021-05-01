@@ -1,7 +1,6 @@
 package com.group.auto_generating_exam.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,29 +11,27 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Builder
-@Table(name = "subject")
-public class Subject implements Serializable {
+@Table(name = "userTrain_question")
+@IdClass(UserTrainQuestion.class)
+public class UserTrainQuestion implements Serializable {
     @Id
-    @Column
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private String sub_id;
-
     @Column
     private Integer user_id;
 
+    @Id
     @Column
-    private String sub_name;
+    private Integer train_id;
+
+    @Id
+    @Column
+    private Integer question_id;
 
     @Column
-    private String description;
+    private String answer;
 
     @Column
-    private Integer stu_num;
+    private Integer is_right;
 
     @Column
-    private String chapter;
-
-    @Column
-    private String chapter_count;
+    private Integer is_commit;
 }

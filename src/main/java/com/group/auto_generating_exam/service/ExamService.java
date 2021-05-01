@@ -38,4 +38,7 @@ public interface ExamService {
     void saveIsJudge(Integer exam_id, int flag);
     void saveUserExamQuestionScore(int score, int question_id, int exam_id, int user_id);
     void saveUserExamQuestionIsJudge(Integer exam_id, int flag);
+    void judgeGeneralQuestion(Integer exam_id);
+    void saveIsRight(Integer is_right, Integer exam_id, Integer question_id, Integer user_id);
+    Integer getExamQuestionScore(Integer question_id, Integer exam_id);
 }

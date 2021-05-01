@@ -79,12 +79,12 @@ public class GeneOP_o
                 q.setHard(question.getHard());
                 q.setDiff(question.getDiff());
 
-                //选择判断题：原分数为1 - 15随机数，错的人多则加分，错的人少则减分
+                //选择判断题：原分数为难度的10倍，ratio少则加分，ratio多则减分
                 if (q.kind.equals(0) || q.kind.equals(1)) {
-                    q.setScore(myRand.nextInt(14) + 1);
+                    q.setScore((int) ((q.hard*10)*(2 - (double)question.getRight_num()/question.getSum_num())));
                 }
-                else { //如果是简答/编程题，则为难度的40倍
-                    q.setScore((int) (q.hard*45));
+                else { //如果是简答/编程题，则为难度的20倍
+                    q.setScore((int) ((q.hard*20)*(2 - (double)question.getRight_num()/question.getSum_num())));
                 }
 
 //                q.setScore(question.getS);

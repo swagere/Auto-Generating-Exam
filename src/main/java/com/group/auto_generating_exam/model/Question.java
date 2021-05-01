@@ -59,4 +59,10 @@ public class Question implements Serializable {
 
     @Column
     private Integer chapter;
+
+    @Column
+    private Integer right_num;
+
+    @Column
+    private Integer sum_num;
 }

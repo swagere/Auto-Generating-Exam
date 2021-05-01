@@ -5,6 +5,7 @@ import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.gene.GeneOP_o;
 import com.group.auto_generating_exam.dao.QuestionRepository;
 import com.group.auto_generating_exam.model.Question;
+import com.group.auto_generating_exam.service.TrainService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,8 @@ public class TrainController {
     GeneOP_o geneOP;
     @Autowired
     QuestionRepository questionRepository;
-
+    @Autowired
+    TrainService trainService;
 
     /**
      * 强化训练
@@ -50,6 +52,9 @@ public class TrainController {
 //            intelligentTestSystem.Generate();
 //        }
 
+        String sub_id = JSON.parseObject(str).get("sub_id").toString();
+        Integer user_id = Integer.parseInt(JSON.parseObject(str).get("user_id").toString());
+
         //输入参数
         int score = Integer.parseInt(JSON.parseObject(str).get("score").toString());
         List kind_origin = ToolUtil.String2List(JSON.parseObject(str).get("kind").toString());
@@ -57,7 +62,7 @@ public class TrainController {
 
         //生成参数
         List hard_origin = ToolUtil.String2List(JSON.parseObject(str).get("hard").toString());
-        List chap_origin = ToolUtil.String2List(JSON.parseObject(str).get("chapter").toString());
+        double[] chap_origin = trainService.getChapterRatio(sub_id, user_id);
         List impo_origin = ToolUtil.String2List(JSON.parseObject(str).get("importance").toString());
 
 
@@ -75,8 +80,8 @@ public class TrainController {
         }
 
         int[] chap = new int[50];
-        for (int i = 0; i < chap_origin.size(); i++) {
-            chap[i] = Integer.parseInt((String) chap_origin.get(i));
+        for (int i = 0; i < chap_origin.length; i++) {
+            chap[i] = (int) chap_origin[i] * 100;
         }
 
         int[] impo = new int[50];
