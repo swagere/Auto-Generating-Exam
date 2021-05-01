@@ -54,5 +54,17 @@ public class SubjectServiceImpl implements SubjectService {
     public List<Subject> getSubjectByUserId(Integer user_id) {
         return subjectRepository.getSubjectByUserId(user_id);
     }
+
+    //根据学生id获取sub_ids
+    @Override
+    public List<String> getSubIdByUserId(Integer user_id) {
+        return userSubjectRepository.getSubIdByUserId(user_id);
+    }
+
+    //根据sub_id获取subject
+    @Override
+    public Subject getSubjectBySubjectId(String sub_id) {
+        return subjectRepository.getSubjectBySubId(sub_id);
+    }
 }
 

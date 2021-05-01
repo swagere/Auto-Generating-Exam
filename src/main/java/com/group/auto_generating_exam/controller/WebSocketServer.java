@@ -221,13 +221,11 @@ public class WebSocketServer {
             }
 
             //将传过来的数据存入user_exam_question表中
-            List questions = ToolUtil.String2List(JSON.parseObject(message).get("data").toString());
+            List<String> questions = ToolUtil.String2List(JSON.parseObject(message).get("data").toString());
 
             Integer error = 0;
-            for (Object q : questions) {
-                System.out.println(type);
-                Map question = JSONObject.parseObject(JSON.toJSONString(q));
-                System.out.println("1");
+            for (String q : questions) {
+                Map question = JSON.parseObject(q, HashMap.class);
                 Integer question_id = Integer.valueOf(String.valueOf(question.get("question_id")));
                 String answer = String.valueOf(question.get("answer"));
 

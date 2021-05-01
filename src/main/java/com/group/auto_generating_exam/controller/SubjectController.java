@@ -91,4 +91,29 @@ public class SubjectController {
         return AjaxResponse.success(res);
     }
 
+    /**
+     * 获得一个学生的全部课程
+     * @param str
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/getStuAllSubject")
+    public @ResponseBody AjaxResponse getStuSubjectExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString());
+
+        List<String> sub_ids = subjectService.getSubIdByUserId(user_id);
+
+        List<Map> res = new ArrayList<>();
+
+        for (String sub_id : sub_ids) {
+            Subject subject = subjectService.getSubjectBySubjectId(sub_id);
+            Map map = new HashMap();
+            map.put("sub_id", subject.getSub_id());
+            map.put("sub_name", subject.getSub_name());
+            map.put("description", subject.getDescription());
+            res.add(map);
+        }
+        return AjaxResponse.success(res);
+    }
+
 }

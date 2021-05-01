@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserSubjectRepository extends JpaRepository<UserSubject, UserSubjectPK> {
     @Query("select s from UserSubject s where s.sub_id=?1 and s.user_id=?2")
@@ -30,4 +32,7 @@ public interface UserSubjectRepository extends JpaRepository<UserSubject, UserSu
 
     @Query("select s.importance_count from UserSubject s where s.sub_id=?1 and s.user_id=?2")
     String getImportanceCount(String Sub_id, Integer user_id);
+
+    @Query("select s.sub_id from UserSubject s where s.user_id = ?1")
+    List<String> getSubIdByUserId(Integer user_id);
 }
