@@ -43,4 +43,5 @@ public interface ExamService {
     Integer getExamQuestionScore(Integer question_id, Integer exam_id);
     void saveExamQuestion(ExamQuestion examQuestion);
     Map getDiscussion(Integer exam_id);
+    Integer getKindByQuestionId(Integer question_id);
 }

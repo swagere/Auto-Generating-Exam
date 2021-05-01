@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.gene.GeneOP_o;
 import com.group.auto_generating_exam.dao.QuestionRepository;
+import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.TrainService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +30,10 @@ public class TrainController {
     @Autowired
     GeneOP_o geneOP;
     @Autowired
-    QuestionRepository questionRepository;
-    @Autowired
     TrainService trainService;
+    @Autowired
+    ExamService examService;
+
 
     /**
      * 强化训练
@@ -99,42 +101,7 @@ public class TrainController {
         //--将user_id train_time(分钟) sub_id保存到train中-------------
         trainService.saveUserIdSubIdAndTrainTimeByTrainId(user_id, sub_id, train_time*1000*60, train_id);
 
-        //得到question列表返回给前端
-        List<Integer> question_ids = trainService.getQuestionIdByTrainId(train_id);
-
-
-        Map res = new HashMap();
-        List r_0 = new ArrayList();
-        List r_1 = new ArrayList();
-        List r_2 = new ArrayList();
-        List r_3 = new ArrayList();
-        List r_4 = new ArrayList();
-
-        for (Integer question_id : question_ids) {
-            Integer k = questionRepository.getKindById(question_id);
-            if (k.equals(0)) {
-                r_0.add(question_id);
-            }
-            else if (k.equals(1)) {
-                r_1.add(question_id);
-            }
-            else if (k.equals(2)) {
-                r_2.add(question_id);
-            }
-            else if (k.equals(3)) {
-                r_3.add(question_id);
-            }
-            else if (k.equals(4)) {
-                r_4.add(question_id);
-            }
-        }
-        res.put("0",r_0);
-        res.put("1",r_1);
-        res.put("2",r_2);
-        res.put("3",r_3);
-        res.put("4",r_4);
-
-        return AjaxResponse.success(res);
+        return AjaxResponse.success(train_id);
     }
 
     /*
@@ -156,4 +123,22 @@ public class TrainController {
         return AjaxResponse.success(trainService.getAllTrain(user_id));
     }
 
+    /**
+     * 学生开始考试时
+     * 获得试卷列表
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping("/getTrainQuestionList")
+    public @ResponseBody AjaxResponse getTrainQuestionList (@RequestBody String str, HttpServletRequest httpServletRequest) {
+        Integer train_id = Integer.parseInt(JSON.parseObject(str).get("train_id").toString());
+
+        //得到question列表返回给前端
+        List<Integer> question_ids = trainService.getQuestionIdByTrainId(train_id);
+
+        //获得传给前端的数据结构
+        Map questionList = trainService.getTrainQuestionList(question_ids);
+
+        return AjaxResponse.success(questionList);
+    }
 }

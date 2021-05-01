@@ -379,7 +379,7 @@ public class ExamServiceImpl implements ExamService {
         for (Integer question_id : questionIdList) {
             Map<String, Object> question = new HashMap<>();
             question.put("question_id", question_id);
-            question.put("question", questionRepository.getQuestionByQuestionId(question_id));
+            question.put("question", questionRepository.getContentByQuestionId(question_id));
             question.put("answer", questionRepository.findAnswerByQuestionId(question_id));
             question.put("score", examQuestionRepository.getScoreByIds(question_id, exam_id));
             questions.add(question);
@@ -408,6 +408,12 @@ public class ExamServiceImpl implements ExamService {
         }
         result.put("stuInfo", stu);
         return result;
+    }
+
+    //根据question_id获取question的kind
+    @Override
+    public Integer getKindByQuestionId(Integer question_id) {
+        return questionRepository.getKindById(question_id);
     }
 }
 

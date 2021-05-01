@@ -50,9 +50,9 @@ public class ExamController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping("/getQuestionList")
+    @RequestMapping("/getExamQuestionList")
     public @ResponseBody
-    AjaxResponse getQuestionList (@RequestBody String str, HttpServletRequest httpServletRequest) {
+    AjaxResponse getExamQuestionList (@RequestBody String str, HttpServletRequest httpServletRequest) {
         Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
         Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
 

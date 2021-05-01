@@ -25,4 +25,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     @Query("select s.hard from Question s where s.question_id = ?1")
     Double getHardById(Integer id);
+
+    @Query("select s.content from Question s where s.question_id = ?1")
+    String getContentByQuestionId(Integer question_id);
 }

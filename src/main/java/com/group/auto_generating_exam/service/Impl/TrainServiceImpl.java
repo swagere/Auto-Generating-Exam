@@ -1,7 +1,7 @@
 package com.group.auto_generating_exam.service.Impl;
 
 import com.group.auto_generating_exam.dao.*;
-import com.group.auto_generating_exam.model.Train;
+import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.TrainService;
 import com.group.auto_generating_exam.util.ToolUtil;
@@ -38,6 +38,8 @@ public class TrainServiceImpl implements TrainService {
     TrainQuestionRepository userTrainQuestionRepository;
     @Autowired
     UserSubjectRepository userSubjectRepository;
+    @Autowired
+    TestCaseRepository testCaseRepository;
 
 
     //获得章节正确率
@@ -195,6 +197,55 @@ public class TrainServiceImpl implements TrainService {
             res.add(m);
         }
         return res;
+    }
+
+    //根据question_id获取question
+    @Override
+    public Map getTrainQuestionList(List<Integer> questions) {
+
+        Map<String, List<GetExamQuestion>> questionList = new HashMap<>();
+
+        List<GetExamQuestion> singleList = new ArrayList<>();
+
+        List<GetExamQuestion> judgeList = new ArrayList<>();
+
+        List<GetExamQuestion> discussionList = new ArrayList<>();
+
+        List<GetExamQuestion> programList = new ArrayList<>();
+        if (!questions.isEmpty()) {
+            // 如果试卷不为空 在question表里获取题目信息
+
+            for (Integer question_id : questions)
+            {
+                Question question =  questionRepository.getQuestionByQuestionId(question_id);
+
+                //传到前端页面
+                GetExamQuestion getQuestion = new GetExamQuestion(question_id, question.getContent(), question.getOptions(), question.getKind(), question.getTip(),null, null);
+                if (question.getKind().equals(0)) {
+                    singleList.add(getQuestion);
+                }
+                else if (question.getKind().equals(1)) {
+                    judgeList.add(getQuestion);
+                }
+                else if (question.getKind().equals(2)) {
+                    discussionList.add(getQuestion);
+                }
+                else if (question.getKind().equals(3) || question.getKind().equals(4)) {
+                    TestCase testCase = testCaseRepository.getTestCaseByQuestionId(question_id);
+                    String input = testCase.getInput();
+                    String output = testCase.getOutput();
+                    getQuestion.setInput(ToolUtil.String2List(input).get(0));
+                    getQuestion.setOutput(ToolUtil.String2List(output).get(0));
+                    programList.add(getQuestion);
+                }
+            }
+
+            questionList.put("Single", singleList);
+            questionList.put("Judge", judgeList);
+            questionList.put("Discussion", discussionList);
+            questionList.put("Program", programList);
+        }
+        return questionList;
     }
 
 

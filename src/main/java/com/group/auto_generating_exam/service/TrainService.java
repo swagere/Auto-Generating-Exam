@@ -17,4 +17,5 @@ public interface TrainService {
     void saveUserIdSubIdAndTrainTimeByTrainId (Integer user_id, String sub_id, Long train_time, Integer train_id);
     List<Integer> getQuestionIdByTrainId(Integer train_id);
     List<Train> getAllTrain(Integer user_id);
+    Map getTrainQuestionList(List<Integer> questions);
 }
