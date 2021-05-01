@@ -176,7 +176,7 @@ public class WebSocketServer {
             Long last_time = examService.getLastTime(exam_id);
             Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
             result.put("type","10001"); //type为10000表考试开始时返回，10002为请求失败
-            result.put("message", rest_time);
+            result.put("message", rest_time/1000);
 
             sendMessage(session, result);
         }
@@ -268,7 +268,10 @@ public class WebSocketServer {
     public static void socketEndExam(Integer exam_id) throws IOException {
         Map result = new HashMap();
         result.put("type", "30001");
-        result.put("message", 0);
+
+        Long last_time = examService.getLastTime(exam_id);
+        Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
+        result.put("message", rest_time/1000);
 
 
         //所有同学选择填空评分 并存入数据库 如果没有简答题则设置is_judge（exam/UserExamQuestion）
