@@ -17,9 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,8 +32,6 @@ public class WebSocketServer {
     private static CopyOnWriteArraySet<Session> SessionSet = new CopyOnWriteArraySet<>();
 
     public static ExamService examService;
-
-
 
 
     //--模板工具-----------------------------------------------------------------------
@@ -179,6 +175,14 @@ public class WebSocketServer {
             result.put("message", rest_time/1000);
 
             sendMessage(session, result);
+
+            //开始计时，到考试时间到时，下发停止考试[问题：疑惑websocket可以多人一起进行不同的考试吗？实现机制是什么呢？]
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                public void run() {
+                    System.out.println("111");
+                }
+            },1000); //指定时间执行
         }
         else if (type == 99999) {
             //如果是保存学生答题结果
@@ -275,11 +279,11 @@ public class WebSocketServer {
         Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
         result.put("message", rest_time/1000);
 
-
-        //所有同学选择填空评分 并存入数据库 如果没有简答题则设置is_judge（exam/UserExamQuestion）
-
         //广播出去
         broadCastInfo(result);
+
+        //通知所有连接着的session 停止考试
+        socketFinishExam(exam_id);
     }
 
     /**
@@ -298,11 +302,14 @@ public class WebSocketServer {
 
     /**
      * 群发消息
-     * 用于考试结束，通知所有已有连接的session，让他们停止考试？？？
+     * 用于考试结束，通知所有已有连接的session，让他们停止考试
      *
      */
     public static void socketFinishExam(Integer exam_id) throws IOException {
+        //发送停止考试通知
 
+
+        //两分钟之后
         //所有同学选择填空评分 并存入数据库 如果没有简答题则设置is_judge（exam/UserExamQuestion）
     }
 
