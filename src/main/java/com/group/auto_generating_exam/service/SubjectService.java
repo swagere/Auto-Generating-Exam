@@ -18,4 +18,5 @@ public interface SubjectService {
     List<String> getSubIdByUserId(Integer user_id);
     Subject getSubjectBySubjectId(String sub_id);
     String getChapterNameBySubId(String sub_id);
+    String getChapterBySubId(String sub_id);
 }

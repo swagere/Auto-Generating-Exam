@@ -11,6 +11,7 @@ import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.JudgeService;
 import com.group.auto_generating_exam.service.SubjectService;
 import com.group.auto_generating_exam.service.UserService;
+import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -125,8 +126,19 @@ public class SubjectController {
     @PostMapping("/getSubjectChapter")
     public @ResponseBody AjaxResponse getSubjectChapter(@RequestBody String str, HttpServletRequest httpServletRequest) {
         String sub_id = JSON.parseObject(str).get("sub_id").toString();
+        List chapter_name = ToolUtil.String2List(subjectService.getChapterNameBySubId(sub_id));
+        List chapter = ToolUtil.String2List(subjectService.getChapterBySubId(sub_id));
+        List res  = new ArrayList();
+        for (int i = 0; i < chapter.size(); i++) {
+            Map temp = new HashMap();
+            temp.put("chapter_name", chapter_name.get(i));
+            temp.put("chapter_id", chapter.get(i));
 
-        return AjaxResponse.success(subjectService.getChapterNameBySubId(sub_id));
+            res.add(temp);
+        }
+
+
+        return AjaxResponse.success(res);
     }
 
 
