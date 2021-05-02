@@ -5,9 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
+import com.group.auto_generating_exam.dao.QuestionRepository;
+import com.group.auto_generating_exam.dao.UserSubjectRepository;
 import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.*;
 import com.group.auto_generating_exam.util.RedisUtils;
+import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,6 +44,10 @@ public class ExamController {
     UserService userService;
     @Autowired
     RedisUtils redisUtils;
+    @Autowired
+    QuestionRepository questionRepository;
+    @Autowired
+    UserSubjectRepository userSubjectRepository;
 
 
 
@@ -526,17 +533,105 @@ public class ExamController {
                 examService.saveUserExamQuestionScore(stuExam.getScore(), question_id, exam_id, stu_id);
                 Integer origin_score = examService.getExamQuestionScore(question_id, exam_id);
                 if (stuExam.getScore().equals(origin_score)) {
+                    //如果答案正确
                     examService.saveIsRight(2, question_id, exam_id, stu_id);
+
+                    //question:right_num sum_num
+                    Question question = questionRepository.getQuestionByQuestionId(question_id);
+                    questionRepository.saveRightNumAndSumNum(question.getRight_num()+ 1, question.getSum_num() + 1, question_id);
+
+                    //user_subject:
+                    //chapter_right_count
+                    //chapter_count
+                    Integer chapter = question.getChapter();
+                    List<Integer> chapter_right_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> chapter_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterCount(question.getSub_id(), question.getUser_id()));
+                    chapter_right_count.set(chapter, chapter_right_count.get(chapter) + 1);
+                    chapter_count.set(chapter, chapter_count.get(chapter) + 1);
+                    userSubjectRepository.saveChapter(chapter_right_count.toString(), chapter_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //hard_right_count
+                    //hard_count
+                    Integer hard = question.HardN();
+                    List<Integer> hard_right_count = ToolUtil.String2ListInt(userSubjectRepository.getHardRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> hard_count = ToolUtil.String2ListInt(userSubjectRepository.getHardCount(question.getSub_id(), question.getUser_id()));
+                    hard_right_count.set(hard, hard_right_count.get(chapter) + 1);
+                    hard_count.set(hard, hard_count.get(chapter) + 1);
+                    userSubjectRepository.saveHard(hard_right_count.toString(), hard_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //importance_right_count
+                    //importance_count
+                    Integer impo = question.ImportanceN();
+                    List<Integer> importance_right_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> importance_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceCount(question.getSub_id(), question.getUser_id()));
+                    importance_right_count.set(impo, importance_right_count.get(chapter) + 1);
+                    importance_count.set(impo, importance_count.get(chapter) + 1);
+                    userSubjectRepository.saveImportance(importance_right_count.toString(), importance_count.toString(), question.getSub_id(), question.getUser_id());
                 }
                 else if (stuExam.getScore().equals(0)) {
+                    //如果答案错误
                     examService.saveIsRight(0, question_id, exam_id, stu_id);
+
+                    //question:right_num sum_num
+                    Question question = questionRepository.getQuestionByQuestionId(question_id);
+                    questionRepository.saveSumNum( question.getSum_num() + 1, question_id);
+
+                    //user_subject:
+                    //chapter_right_count
+                    //chapter_count
+                    Integer chapter = question.getChapter();
+                    List<Integer> chapter_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterCount(question.getSub_id(), question.getUser_id()));
+                    chapter_count.set(chapter, chapter_count.get(chapter) + 1);
+                    userSubjectRepository.saveChapterCount(chapter_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //hard_right_count
+                    //hard_count
+                    Integer hard = question.HardN();
+                    List<Integer> hard_count = ToolUtil.String2ListInt(userSubjectRepository.getHardCount(question.getSub_id(), question.getUser_id()));
+                    hard_count.set(hard, hard_count.get(chapter) + 1);
+                    userSubjectRepository.saveHardCount( hard_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //importance_right_count
+                    //importance_count
+                    Integer impo = question.ImportanceN();
+                    List<Integer> importance_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceCount(question.getSub_id(), question.getUser_id()));
+                    importance_count.set(impo, importance_count.get(chapter) + 1);
+                    userSubjectRepository.saveImportanceCount(importance_count.toString(), question.getSub_id(), question.getUser_id());
                 }
                 else  {
+                    //如果答案不完全正确
                     examService.saveIsRight(1, question_id, exam_id, stu_id);
+
+                    //question:right_num sum_num
+                    Question question = questionRepository.getQuestionByQuestionId(question_id);
+                    questionRepository.saveSumNum( question.getSum_num() + 1, question_id);
+
+                    //user_subject:
+                    //chapter_right_count
+                    //chapter_count
+                    Integer chapter = question.getChapter();
+                    List<Integer> chapter_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterCount(question.getSub_id(), question.getUser_id()));
+                    chapter_count.set(chapter, chapter_count.get(chapter) + 1);
+                    userSubjectRepository.saveChapterCount(chapter_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //hard_right_count
+                    //hard_count
+                    Integer hard = question.HardN();
+                    List<Integer> hard_count = ToolUtil.String2ListInt(userSubjectRepository.getHardCount(question.getSub_id(), question.getUser_id()));
+                    hard_count.set(hard, hard_count.get(chapter) + 1);
+                    userSubjectRepository.saveHardCount( hard_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //importance_right_count
+                    //importance_count
+                    Integer impo = question.ImportanceN();
+                    List<Integer> importance_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceCount(question.getSub_id(), question.getUser_id()));
+                    importance_count.set(impo, importance_count.get(chapter) + 1);
+                    userSubjectRepository.saveImportanceCount(importance_count.toString(), question.getSub_id(), question.getUser_id());
                 }
             }
 
             examService.saveUserExamQuestionIsJudge(exam_id, 1);
+
             return AjaxResponse.success();
         } catch (Exception e) {
             log.error(e.getMessage());

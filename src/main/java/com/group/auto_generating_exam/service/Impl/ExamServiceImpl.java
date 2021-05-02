@@ -333,7 +333,7 @@ public class ExamServiceImpl implements ExamService {
             else {
                 if (userExamQuestion.getAnswer() != null && userExamQuestion.getAnswer().equals(questionRepository.getAnswerByQuestionId(question_id))){
                     //答案正确
-                    userExamQuestionRepository.saveScoreAndIsRightAndIsJudge(examQuestionRepository.getScoreByIds(question_id, exam_id),1, 1, question_id,exam_id,userExamQuestion.getUser_id());
+                    userExamQuestionRepository.saveScoreAndIsRightAndIsJudge(examQuestionRepository.getScoreByIds(question_id, exam_id),2, 1, question_id,exam_id,userExamQuestion.getUser_id());
                     //question:right_num sum_num
                     Question question = questionRepository.getQuestionByQuestionId(question_id);
                     questionRepository.saveRightNumAndSumNum(question.getRight_num()+ 1, question.getSum_num() + 1, question_id);

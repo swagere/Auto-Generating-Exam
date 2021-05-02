@@ -336,6 +336,8 @@ public class WebSocketServer {
 
         //广播出去
         broadCastInfo(result, exam_id, "exam");
+
+        //更改timer计时器
     }
 
     /**
