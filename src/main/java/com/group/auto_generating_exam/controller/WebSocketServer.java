@@ -35,6 +35,8 @@ public class WebSocketServer {
     // concurrent包的线程安全Set，用来存放每个客户端对应的Session对象。  
     private static ConcurrentHashMap<Session, WebSocketServer> webSocketSet = new ConcurrentHashMap<>();
 
+    private static HashMap timers = new HashMap();
+
     private Integer exam_id;
 
     private String type;
@@ -217,6 +219,7 @@ public class WebSocketServer {
                         socketFinishExam(exam_id);
                     }
                 },rest_time); //指定时间执行
+                timers.put(exam_id, timer);
             }
         }
 
@@ -321,6 +324,10 @@ public class WebSocketServer {
 
         //通知所有连接着的session 停止考试
         socketFinishExam(exam_id);
+
+        Timer timer = (Timer) timers.get(exam_id);
+        timer.cancel();
+        timers.remove(exam_id); //删除计时器
     }
 
     /**
@@ -338,6 +345,16 @@ public class WebSocketServer {
         broadCastInfo(result, exam_id, "exam");
 
         //更改timer计时器
+        Timer timer = (Timer) timers.get(exam_id);
+        timer.cancel();
+        Timer new_timer = new Timer();
+        new_timer.schedule(new TimerTask() {
+            @SneakyThrows
+            public void run() {
+                socketFinishExam(exam_id);
+            }
+        },rest_time); //指定时间执行
+        timers.replace(exam_id, new_timer);
     }
 
     /**
