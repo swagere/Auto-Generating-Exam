@@ -10,14 +10,18 @@ import com.group.auto_generating_exam.model.Question;
 import com.group.auto_generating_exam.model.UserExamQuestion;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.util.ToolUtil;
+import io.lettuce.core.dynamic.annotation.Param;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,18 +33,30 @@ public class WebSocketServer {
     //用来统计连接客户端的数量
     private static final AtomicInteger OnlineCount = new AtomicInteger(0);
     // concurrent包的线程安全Set，用来存放每个客户端对应的Session对象。  
-    private static CopyOnWriteArraySet<Session> SessionSet = new CopyOnWriteArraySet<>();
+    private static ConcurrentHashMap<Session, WebSocketServer> webSocketSet = new ConcurrentHashMap<>();
+
+    private Integer exam_id;
+
+    private String type;
 
     public static ExamService examService;
 
 
     //--模板工具-----------------------------------------------------------------------
     /**
+     * exam/train
      * 连接建立成功调用的方法
      */
     @OnOpen
-    public void onOpen(Session session) throws IOException {
-        SessionSet.add(session);
+    public void onOpen(@PathParam(value = "data") String str, Session session) throws IOException {
+        Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
+        String type = JSON.parseObject(str).get("type").toString();
+
+        this.exam_id = exam_id;
+        this.type = type;
+
+        webSocketSet.put(session, this); //以session作唯一标识
+
         int cnt = OnlineCount.incrementAndGet(); // 在线数加1  
         log.info("有连接加入，当前连接数为：{}", cnt);
     }
@@ -58,24 +74,27 @@ public class WebSocketServer {
 
 
     /**
+     * exam/train
      * 连接关闭调用的方法
      */
     @OnClose
     public void onClose(Session session) {
-        SessionSet.remove(session);
+        webSocketSet.remove(session);
         int cnt = OnlineCount.decrementAndGet();
-        log.info("有连接关闭，当前连接数为：{}", cnt);
+        log.info("There are connections closed,The current number of connections is:{}", cnt);
     }
 
     /**
+     * exam/train
      * 出现错误
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        log.error("发生错误：{}，Session ID： {}",error.getMessage(),session.getId());
+        log.error("An error occurred:{},Session ID：:{}",error.getMessage(),session.getId());
     }
 
     /**
+     * exam/train
      * 发送消息，实践表明，每次浏览器刷新，session会发生变化。 
      * @param session  session
      * @param map  消息
@@ -86,21 +105,25 @@ public class WebSocketServer {
     }
 
     /**
+     * exam/train
      * 群发消息
      *
      * @param message  消息
      */
-    public static void broadCastInfo(Map message) throws IOException {
-        for (Session session : SessionSet) {
-            if(session.isOpen()){
+    public static void broadCastInfo(Map message, Integer exam_id, String type) throws IOException {
+        for (Session session: webSocketSet.keySet()) {
+            WebSocketServer key = webSocketSet.get(session);
+            if(key.exam_id.equals(exam_id) && key.type.equals(type)){
                 sendMessage(session, message);
             }
         }
+
     }
 
 
     //--考试实现---------------------------------------------------------
     /**
+     * exam
      * 接收消息
      * 开始考试
      * @param message
@@ -176,14 +199,27 @@ public class WebSocketServer {
 
             sendMessage(session, result);
 
-            //开始计时，到考试时间到时，下发停止考试[问题：疑惑websocket可以多人一起进行不同的考试吗？实现机制是什么呢？]
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                public void run() {
-                    System.out.println("111");
+            //如果是一个开始此考试的人
+            //则开始计时，到考试时间到时，下发停止考试
+            int flag = 0;
+            for (Session s: webSocketSet.keySet()) {
+                WebSocketServer key = webSocketSet.get(s);
+                if(key.exam_id.equals(exam_id)){
+                    flag ++;
+                    break;
                 }
-            },1000); //指定时间执行
+            }
+            if (flag == 0) {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @SneakyThrows
+                    public void run() {
+                        socketFinishExam(exam_id);
+                    }
+                },rest_time); //指定时间执行
+            }
         }
+
         else if (type == 99999) {
             //如果是保存学生答题结果
 
@@ -267,6 +303,7 @@ public class WebSocketServer {
 
 
     /**
+     * exam
      * 群发消息
      * 用于提前终止，通知所有已有连接的session，让他们停止考试
      *
@@ -279,38 +316,52 @@ public class WebSocketServer {
         Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
         result.put("message", rest_time/1000);
 
-        //广播出去
-        broadCastInfo(result);
+        //广播出去，让此考试下的学生收到消息终止考试
+        broadCastInfo(result, exam_id, "exam");
 
         //通知所有连接着的session 停止考试
         socketFinishExam(exam_id);
     }
 
     /**
+     * exam
      * 群发消息
      * 用于更改时间，通知所有已有连接的session，更改考试时间
      *
      */
-    public static void socketChangExamTime(Long rest_time) throws IOException {
+    public static void socketChangExamTime(Long rest_time, Integer exam_id) throws IOException {
         Map result = new HashMap();
         result.put("type", "20001");
         result.put("message", rest_time);
 
         //广播出去
-        broadCastInfo(result);
+        broadCastInfo(result, exam_id, "exam");
     }
 
     /**
+     * exam
      * 群发消息
      * 用于考试结束，通知所有已有连接的session，让他们停止考试
      *
      */
     public static void socketFinishExam(Integer exam_id) throws IOException {
         //发送停止考试通知
+        Map result = new HashMap();
+        result.put("type", "50001");
+        result.put("message", 0);
 
+        broadCastInfo(result, exam_id, "exam");
 
         //两分钟之后
         //所有同学选择填空评分 并存入数据库 如果没有简答题则设置is_judge（exam/UserExamQuestion）
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                examService.judgeGeneralQuestion(exam_id);
+            }
+        },120 * 1000); //指定时间执行
     }
+
+
 
 } 

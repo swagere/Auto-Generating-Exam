@@ -137,7 +137,7 @@ public class ExamController {
         else {
             //通知所有在考试的前端
             System.out.println("2");
-            WebSocketServer.socketChangExamTime(rest_time);
+            WebSocketServer.socketChangExamTime(rest_time, exam_id);
         }
 
         return AjaxResponse.success();

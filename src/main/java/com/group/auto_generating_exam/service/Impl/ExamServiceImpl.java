@@ -16,10 +16,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  *
@@ -48,6 +46,8 @@ public class ExamServiceImpl implements ExamService {
     private Mapper dozerMapper;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserSubjectRepository userSubjectRepository;
 
 
     //获取试卷列表（学生开始答题）
@@ -317,20 +317,98 @@ public class ExamServiceImpl implements ExamService {
     //所有学生选择题判断题 判分 并保存结果（exam/UserExamQuestion）【计算right_ratio并一起存入数据库】
     @Override
     public void judgeGeneralQuestion(Integer exam_id) {
-//        ArrayList<StuExam> stuExams = stuExamRepository.getByExam_id(exam_id);
-//        for (StuExam stuExam : stuExams) {
-//            if (!stuExam.getType().equals(Question.Type.Single) && !stuExam.getType().equals(Question.Type.Judge)) {
-//                continue;
-//            }
-//            long question_id = stuExam.getQuestion_id();
-//            if (stuExam.getAnswer() != null && stuExam.getAnswer().equals(questionRepository.findAnswerById(question_id))){
-//                stuExam.setScore(examQuestionRepository.findScoreById(question_id, exam_id));
-//            } else {
-//                stuExam.setScore(0);
-//            }
-//            stuExamRepository.saveScore(stuExam.getScore(),stuExam.getQuestion_id(),stuExam.getExam_id(),stuExam.getStu_id());
-//        }
-//
+        //userExamQuestion:score is_judge is_right
+        List<UserExamQuestion> userExamQuestions = userExamQuestionRepository.getUserExamQuestionByExamId(exam_id);
+        int flag = 0;
+        for (UserExamQuestion userExamQuestion : userExamQuestions) {
+            Integer question_id = userExamQuestion.getQuestion_id();
+            Integer kind = questionRepository.getKindById(question_id);
+            if (kind.equals(2)) {
+                flag ++;
+                continue;
+            }
+            else if (kind.equals(3) || kind.equals(4)) {
+                continue;
+            }
+            else {
+                if (userExamQuestion.getAnswer() != null && userExamQuestion.getAnswer().equals(questionRepository.getAnswerByQuestionId(question_id))){
+                    //答案正确
+                    userExamQuestionRepository.saveScoreAndIsRightAndIsJudge(examQuestionRepository.getScoreByIds(question_id, exam_id),1, 1, question_id,exam_id,userExamQuestion.getUser_id());
+                    //question:right_num sum_num
+                    Question question = questionRepository.getQuestionByQuestionId(question_id);
+                    questionRepository.saveRightNumAndSumNum(question.getRight_num()+ 1, question.getSum_num() + 1, question_id);
+
+                    //user_subject:
+                    //chapter_right_count
+                    //chapter_count
+                    Integer chapter = question.getChapter();
+                    List<Integer> chapter_right_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> chapter_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterCount(question.getSub_id(), question.getUser_id()));
+                    chapter_right_count.set(chapter, chapter_right_count.get(chapter) + 1);
+                    chapter_count.set(chapter, chapter_count.get(chapter) + 1);
+                    userSubjectRepository.saveChapter(chapter_right_count.toString(), chapter_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //hard_right_count
+                    //hard_count
+                    Integer hard = question.HardN();
+                    List<Integer> hard_right_count = ToolUtil.String2ListInt(userSubjectRepository.getHardRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> hard_count = ToolUtil.String2ListInt(userSubjectRepository.getHardCount(question.getSub_id(), question.getUser_id()));
+                    hard_right_count.set(hard, hard_right_count.get(chapter) + 1);
+                    hard_count.set(hard, hard_count.get(chapter) + 1);
+                    userSubjectRepository.saveHard(hard_right_count.toString(), hard_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //importance_right_count
+                    //importance_count
+                    Integer impo = question.ImportanceN();
+                    List<Integer> importance_right_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> importance_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceCount(question.getSub_id(), question.getUser_id()));
+                    importance_right_count.set(impo, importance_right_count.get(chapter) + 1);
+                    importance_count.set(impo, importance_count.get(chapter) + 1);
+                    userSubjectRepository.saveImportance(importance_right_count.toString(), importance_count.toString(), question.getSub_id(), question.getUser_id());
+
+                }
+                else {
+                    //答案错误
+                    userExamQuestionRepository.saveScoreAndIsRightAndIsJudge(0,0, 1,question_id,exam_id,userExamQuestion.getUser_id());
+                    //question:right_num sum_num
+                    Question question = questionRepository.getQuestionByQuestionId(question_id);
+                    questionRepository.saveSumNum( question.getSum_num() + 1, question_id);
+
+                    //user_subject:
+                    //chapter_right_count
+                    //chapter_count
+                    Integer chapter = question.getChapter();
+                    List<Integer> chapter_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterCount(question.getSub_id(), question.getUser_id()));
+                    chapter_count.set(chapter, chapter_count.get(chapter) + 1);
+                    userSubjectRepository.saveChapterCount(chapter_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //hard_right_count
+                    //hard_count
+                    Integer hard = question.HardN();
+                    List<Integer> hard_count = ToolUtil.String2ListInt(userSubjectRepository.getHardCount(question.getSub_id(), question.getUser_id()));
+                    hard_count.set(hard, hard_count.get(chapter) + 1);
+                    userSubjectRepository.saveHardCount( hard_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //importance_right_count
+                    //importance_count
+                    Integer impo = question.ImportanceN();
+                    List<Integer> importance_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceCount(question.getSub_id(), question.getUser_id()));
+                    importance_count.set(impo, importance_count.get(chapter) + 1);
+                    userSubjectRepository.saveImportanceCount(importance_count.toString(), question.getSub_id(), question.getUser_id());
+
+
+
+                }
+
+            }
+
+        }
+
+        //exam:is_judge
+        if (flag == 0) {
+            examRepository.saveIsJudge(exam_id,1);
+        }
+
     }
 
     //存入试卷的每一道题的is_right
@@ -414,6 +492,12 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Integer getKindByQuestionId(Integer question_id) {
         return questionRepository.getKindById(question_id);
+    }
+
+    //根据exam_id获取所有学生做过的试题
+    @Override
+    public List<UserExamQuestion> getUserExamQuestionList(Integer exam_id) {
+        return userExamQuestionRepository.getUserExamQuestionByExamId(exam_id);
     }
 }
 

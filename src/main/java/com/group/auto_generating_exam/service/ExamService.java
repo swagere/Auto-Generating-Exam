@@ -3,6 +3,7 @@ package com.group.auto_generating_exam.service;
 import com.group.auto_generating_exam.model.Exam;
 import com.group.auto_generating_exam.model.ExamQuestion;
 import com.group.auto_generating_exam.model.GetQuestion;
+import com.group.auto_generating_exam.model.UserExamQuestion;
 
 import java.util.List;
 import java.util.Map;
@@ -44,4 +45,5 @@ public interface ExamService {
     void saveExamQuestion(ExamQuestion examQuestion);
     Map getDiscussion(Integer exam_id);
     Integer getKindByQuestionId(Integer question_id);
+    List<UserExamQuestion> getUserExamQuestionList(Integer exam_id);
 }

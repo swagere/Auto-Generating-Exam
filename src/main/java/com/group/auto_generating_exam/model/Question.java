@@ -65,4 +65,29 @@ public class Question implements Serializable {
 
     @Column
     private Integer sum_num;
+
+    // 返回所属题型
+    public int KindN() {
+        return kind;
+    }
+
+    // 返回难度
+    public int HardN() {
+        //以0.2为间隔计算
+        return (int)(hard/0.2);
+    }
+
+    public int DiffN() {
+        if (diff < 0.2) return 0; //[-1,0.2]都属于第一类
+        return (int)(diff / 0.2);
+    }
+
+    public int ChapterN() {
+        return chapter;
+    }
+
+    public int ImportanceN() {
+        return importance;
+    }
+
 }
