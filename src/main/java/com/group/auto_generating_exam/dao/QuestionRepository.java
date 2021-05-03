@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("select s from Question s where s.question_id = ?1")
@@ -51,5 +52,8 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Transactional
     @Query("update Question u set u.sum_num = :sum_num where u.question_id = :question_id")
     void saveSumNum(@Param("sum_num") Integer sum_num, @Param("question_id") Integer question_id);
+
+    @Query("select s from Question s where s.sub_id = ?1")
+    List<Question> getQuestionBySubId(String sub_id);
 
 }

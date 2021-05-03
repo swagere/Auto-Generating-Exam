@@ -499,5 +499,11 @@ public class ExamServiceImpl implements ExamService {
     public List<UserExamQuestion> getUserExamQuestionList(Integer exam_id) {
         return userExamQuestionRepository.getUserExamQuestionByExamId(exam_id);
     }
+
+    //根据sub_id获得quesiton
+    @Override
+    public List<Question> getQuestionBySubId(String sub_id) {
+        return questionRepository.getQuestionBySubId(sub_id);
+    }
 }
 

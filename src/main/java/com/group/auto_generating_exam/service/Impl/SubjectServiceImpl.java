@@ -78,5 +78,11 @@ public class SubjectServiceImpl implements SubjectService {
     public String getChapterBySubId(String sub_id) {
         return subjectRepository.getChapterBySubId(sub_id);
     }
+
+    //根据sub_id获得所有学生选课表user_subject
+    @Override
+    public List<UserSubject> getUserSubject(String sub_id) {
+        return userSubjectRepository.getUserSubjectBySubId(sub_id);
+    }
 }
 

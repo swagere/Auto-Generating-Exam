@@ -69,4 +69,6 @@ public interface UserSubjectRepository extends JpaRepository<UserSubject, UserSu
     @Query("update UserSubject u set u.importance_count = :importance_count where u.sub_id = :sub_id and u.user_id = :user_id")
     void saveImportanceCount(@Param("importance_count") String importance_count, @Param("sub_id") String sub_id, @Param("user_id") Integer user_id);
 
+    @Query("select u from UserSubject u where u.sub_id = ?1")
+    List<UserSubject> getUserSubjectBySubId(String sub_id);
 }

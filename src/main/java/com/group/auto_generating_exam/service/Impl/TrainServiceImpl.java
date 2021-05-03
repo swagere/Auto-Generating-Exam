@@ -192,7 +192,7 @@ public class TrainServiceImpl implements TrainService {
             m.put("train_id", train.getTrain_id());
             m.put("train_name", train.getTrain_name());
             m.put("train_type", train.getTrain_type());
-            m.put("train_time", train.getTrain_time());
+            m.put("train_time", train.getTrain_time() / 1000);
 
             res.add(m);
         }

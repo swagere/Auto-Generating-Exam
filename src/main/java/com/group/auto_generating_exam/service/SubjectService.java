@@ -1,6 +1,7 @@
 package com.group.auto_generating_exam.service;
 
 import com.group.auto_generating_exam.model.Subject;
+import com.group.auto_generating_exam.model.UserSubject;
 
 import java.util.List;
 import java.util.Map;
@@ -19,4 +20,5 @@ public interface SubjectService {
     Subject getSubjectBySubjectId(String sub_id);
     String getChapterNameBySubId(String sub_id);
     String getChapterBySubId(String sub_id);
+    List<UserSubject> getUserSubject(String sub_id);
 }
