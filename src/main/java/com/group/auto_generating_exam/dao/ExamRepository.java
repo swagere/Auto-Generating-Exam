@@ -36,7 +36,7 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
     @Query("select max(u.exam_id) from Exam u")
     Integer getMaxExamId();
 
-    @Query("select u from Exam u where u.sub_id = ?1")
+    @Query("select u from Exam u where u.sub_id = ?1 order by u.begin_time desc ")
     List<Exam> getExamBySubId(String sub_id);
 
     @Query("select u from Exam u where u.exam_id in (:exam_ids) order by u.begin_time desc ")
