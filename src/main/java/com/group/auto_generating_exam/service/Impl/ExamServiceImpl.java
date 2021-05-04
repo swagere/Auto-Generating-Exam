@@ -124,7 +124,7 @@ public class ExamServiceImpl implements ExamService {
         if (exam_time > now_time) {
             return "will";
         }
-        else if (exam_time + last_time * 60000 < now_time) {
+        else if (exam_time + last_time < now_time) {
             return "over";
         }
         return "ing";

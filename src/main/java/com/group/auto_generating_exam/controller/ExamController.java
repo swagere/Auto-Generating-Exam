@@ -98,6 +98,7 @@ public class ExamController {
     /**
      * 老师更改考试时间
      * 若考试时间改变，则通知前端新的持续时间
+     * last_time 分钟
      */
     @RequestMapping("/changeExamTime")
     public @ResponseBody AjaxResponse changeExamTime(@RequestBody String str, HttpServletRequest httpServletRequest) throws IOException {
@@ -133,18 +134,16 @@ public class ExamController {
         }
 
         //修改考试时间
-        examService.saveLastTime(last_time, exam_id);
+        examService.saveLastTime(last_time * 60 * 1000, exam_id);
 
 
         // 如果考试未开始则不用通知前端
-        if (rest_time > last_time * 60000) {
-            System.out.println("1");
+        if (rest_time > last_time * 60 * 1000) {
             return AjaxResponse.success();
         }
         else {
             //通知所有在考试的前端
-            System.out.println("2");
-            WebSocketServer.socketChangExamTime(rest_time, exam_id);
+            WebSocketServer.socketChangExamTime(rest_time / 1000, exam_id);
         }
 
         return AjaxResponse.success();
