@@ -260,9 +260,9 @@ public class ExamServiceImpl implements ExamService {
         return examRepository.getExamBySubId(sub_id);
     }
 
-    //获取一个学生的所有考试
+    //获取一个学生的已有的所有考试
     @Override
-    public List<Integer> getExamIdsByUserId(Integer user_id) {
+    public List<Integer> getUserExamIdsByUserId(Integer user_id) {
         return userExamQuestionRepository.getExamIdsByUserId(user_id);
     }
 
@@ -504,6 +504,12 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public List<Question> getQuestionBySubId(String sub_id) {
         return questionRepository.getQuestionBySubId(sub_id);
+    }
+
+    //根据sub_id获取exam_id
+    @Override
+    public List<Integer> getExamIdBySudId(List<String> sub_id) {
+        return examRepository.getExamIdBySubId(sub_id);
     }
 }
 

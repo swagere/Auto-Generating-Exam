@@ -29,7 +29,7 @@ public interface ExamService {
     void saveIsCommit(Integer is_commit, Integer question_id, Integer exam_id, Integer user_id);
     Integer saveExam(Exam exam);
     List<Exam> getExamBySubId(String sub_id);
-    List<Integer> getExamIdsByUserId(Integer user_id);
+    List<Integer> getUserExamIdsByUserId(Integer user_id);
     Integer getExamScore(Integer exam_id, Integer user_id);
     Integer getMaxQuestionId();
     long saveQuestion(GetQuestion getQuestion)  throws Exception;
@@ -44,4 +44,5 @@ public interface ExamService {
     Integer getKindByQuestionId(Integer question_id);
     List<UserExamQuestion> getUserExamQuestionList(Integer exam_id);
     List<Question> getQuestionBySubId(String sub_id);
+    List<Integer> getExamIdBySudId(List<String> sub_id);
 }

@@ -47,6 +47,6 @@ public interface ExamRepository extends JpaRepository<Exam, Integer> {
     @Query("update Exam u set u.is_judge = :is_judge where u.exam_id = :exam_id")
     void saveIsJudge(@Param("exam_id") Integer exam_id, @Param("is_judge") int is_judge);
 
-    @Query("select u.exam_id from Exam u where u.sub_id = ?1")
-    List<Integer> getExamIdBySubId(String sub_id);
+    @Query("select u.exam_id from Exam u where u.sub_id in (:sub_ids) order by u.begin_time desc")
+    List<Integer> getExamIdBySubId(List<String> sub_ids);
 }

@@ -388,7 +388,10 @@ public class ExamController {
     public @ResponseBody AjaxResponse getStuAllExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
         Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString());
 
-        List<Integer> exam_ids = examService.getExamIdsByUserId(user_id);
+        List<String> sub_ids = subjectService.getSubIdByUserId(user_id);
+
+        List<Integer> exam_ids = examService.getExamIdBySudId(sub_ids);
+
         if (exam_ids.isEmpty()) {
             return AjaxResponse.success();
         }
