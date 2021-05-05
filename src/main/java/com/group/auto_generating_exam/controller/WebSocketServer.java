@@ -326,8 +326,13 @@ public class WebSocketServer {
         socketFinishExam(exam_id);
 
         Timer timer = (Timer) timers.get(exam_id);
-        timer.cancel();
+        try {
+            timer.cancel();
+        }catch (NullPointerException e) {
+            log.info("没有学生正在参加" + exam_id + "考试");
+        }
         timers.remove(exam_id); //删除计时器
+
     }
 
     /**
@@ -346,7 +351,12 @@ public class WebSocketServer {
 
         //更改timer计时器
         Timer timer = (Timer) timers.get(exam_id);
-        timer.cancel();
+        try {
+            timer.cancel();
+        } catch (NullPointerException e) {
+            log.info("没有学生正在参加" + exam_id + "考试");
+        }
+
         Timer new_timer = new Timer();
         new_timer.schedule(new TimerTask() {
             @SneakyThrows
