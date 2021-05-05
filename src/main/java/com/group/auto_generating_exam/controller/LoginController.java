@@ -35,12 +35,18 @@ public class LoginController {
 
         //添加sessionID到map（传给前端）
         Map<String, Object> map = new HashMap<>();
-        map.put("id", login1.getId());
+        map.put("id", login1.getUser_id());
         map.put("session", request.getSession().getId());
         map.put("authority", login1.getAuthority());
 
         //添加数据到session(保存到session和redis)
         request.getSession().setAttribute("userInfo", map);
+
+
+        map.put("name", login1.getName());
+        map.put("telephone", login1.getTelephone());
+        map.put("email", login1.getEmail());
+
 
         return AjaxResponse.success(map);
     }

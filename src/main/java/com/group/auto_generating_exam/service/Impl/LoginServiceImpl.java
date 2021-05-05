@@ -25,8 +25,10 @@ public class LoginServiceImpl implements LoginService {
             if (BCrypt.checkpw(login.getPassword(), user.getPassword())) {
 
                 log.info("学生登录验证成功");
-                login.setId(user.getUser_id());
+                login.setUser_id(user.getUser_id());
                 login.setAuthority(user.getAuthority());
+                login.setEmail(user.getEmail());
+                login.setName(user.getName());
                 return login;
 
             } else {
