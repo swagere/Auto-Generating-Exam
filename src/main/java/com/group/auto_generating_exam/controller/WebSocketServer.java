@@ -1,16 +1,8 @@
 package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.group.auto_generating_exam.config.exception.AjaxResponse;
-import com.group.auto_generating_exam.config.exception.CustomException;
-import com.group.auto_generating_exam.config.exception.CustomExceptionType;
-import com.group.auto_generating_exam.model.Exam;
-import com.group.auto_generating_exam.model.Question;
-import com.group.auto_generating_exam.model.UserExamQuestion;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.util.ToolUtil;
-import io.lettuce.core.dynamic.annotation.Param;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -135,6 +127,8 @@ public class WebSocketServer {
     public void OnMessage(String message, Session session) throws IOException {
         //检验学生身份
 
+        System.out.println("11111111111111");
+
         Integer type = Integer.valueOf(JSON.parseObject(message).get("type").toString());
         Integer exam_id = Integer.valueOf(JSON.parseObject(message).get("exam_id").toString());
         Integer user_id = Integer.valueOf(JSON.parseObject(message).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
@@ -144,9 +138,13 @@ public class WebSocketServer {
         if (type == 999) {
             //--如果是请求考试剩余时间---------------------
 
+            System.out.println("222222222222");
+
             //返回前端
             Long last_time = examService.getLastTime(exam_id);
             Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
+
+            System.out.println("333333333333");
 
             result.put("type","100"); //type为10000表考试开始时返回，10002为请求失败
             result.put("message", rest_time/1000); //以秒为单位

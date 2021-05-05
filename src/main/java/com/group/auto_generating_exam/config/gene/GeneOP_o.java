@@ -89,7 +89,7 @@ public class GeneOP_o
                     q.setScore((int) ((q.hard*10)*(2 - (double)question.getRight_num()/question.getSum_num())));
                 }
                 else { //如果是简答/编程题，则为难度的20倍
-                    q.setScore((int) ((q.hard*20)*(2 - (double)question.getRight_num()/question.getSum_num())));
+                    q.setScore((int) ((q.hard*15)*(2 - (double)question.getRight_num()/question.getSum_num())));
                 }
 
 //                q.setScore(question.getS);
