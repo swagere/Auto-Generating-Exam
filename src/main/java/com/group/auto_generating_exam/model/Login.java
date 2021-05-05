@@ -19,7 +19,7 @@ public class Login implements Serializable {
     @NotBlank(message = "密码不能为空")
     private String password;
 
-    private String id = null;
+    private Integer id = null;
 
     private int authority;
 }
