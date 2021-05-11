@@ -183,7 +183,7 @@ public class ExamServiceImpl implements ExamService {
     public Long getRestTimeByExamId(Integer exam_id, Long last_time) {
         Long begin_time = examRepository.getBeginTimeByExamId(exam_id);
         Long now_time = System.currentTimeMillis();
-        return last_time * 60000 - (now_time - begin_time);
+        return last_time - (now_time - begin_time);
     }
 
     //返回考试持续时间

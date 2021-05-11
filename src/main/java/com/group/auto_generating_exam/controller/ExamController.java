@@ -127,7 +127,7 @@ public class ExamController {
         }
 
         //判断修改时间是否小于已经进行的考试时间
-        Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
+        Long rest_time = examService.getRestTimeByExamId(exam_id, last_time * 60000);
         if (rest_time < 0) {
             //如果修改时间小于已经考试的时间
             return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"不能小于考试已持续的时间"));

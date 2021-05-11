@@ -5,7 +5,6 @@ import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -14,12 +13,11 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
-@ServerEndpoint(value = "/ws/asset")
+@ServerEndpoint(value = "/websocket/{data}")
 public class WebSocketServer {
 
     //用来统计连接客户端的数量
@@ -43,6 +41,7 @@ public class WebSocketServer {
      */
     @OnOpen
     public void onOpen(@PathParam(value = "data") String str, Session session) throws IOException {
+        str = "{" + str + "}";
         Integer exam_id = Integer.valueOf(JSON.parseObject(str).get("exam_id").toString());
         String type = JSON.parseObject(str).get("type").toString();
 
@@ -84,7 +83,7 @@ public class WebSocketServer {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        log.error("An error occurred:{},Session ID：:{}",error.getMessage(),session.getId());
+        log.error("An error occurred:{},Session ID:{}",error.getMessage(),session.getId());
     }
 
     /**
@@ -127,7 +126,6 @@ public class WebSocketServer {
     public void OnMessage(String message, Session session) throws IOException {
         //检验学生身份
 
-        System.out.println("11111111111111");
 
         Integer type = Integer.valueOf(JSON.parseObject(message).get("type").toString());
         Integer exam_id = Integer.valueOf(JSON.parseObject(message).get("exam_id").toString());
@@ -138,13 +136,11 @@ public class WebSocketServer {
         if (type == 999) {
             //--如果是请求考试剩余时间---------------------
 
-            System.out.println("222222222222");
 
             //返回前端
             Long last_time = examService.getLastTime(exam_id);
             Long rest_time = examService.getRestTimeByExamId(exam_id, last_time);
 
-            System.out.println("333333333333");
 
             result.put("type","100"); //type为10000表考试开始时返回，10002为请求失败
             result.put("message", rest_time/1000); //以秒为单位
