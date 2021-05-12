@@ -45,14 +45,6 @@ public class GeneOP_o
         Random myRand = new Random(5 * (int) TimeUtils.getSecondTimestamp(date));
 
         //--数据库操作--------------------------------------------------------
-        //根据sub_id获取试卷信息
-        public Subject GetSubject(String sub_id) {
-            Subject subject = subjectRepository.getSubjectBySubId(sub_id);
-            if (subject == null) {
-                throw new CustomException(CustomExceptionType.USER_INPUT_ERROR, "题目不存在");
-            }
-            return subject;
-        }
 
         //初始化questions[]
         public void GetDatabaseForTest() {
@@ -86,10 +78,10 @@ public class GeneOP_o
 
                 //选择判断题：原分数为难度的10倍，ratio少则加分，ratio多则减分
                 if (q.kind.equals(0) || q.kind.equals(1)) {
-                    q.setScore((int) ((q.hard*10)*(2 - (double)question.getRight_num()/question.getSum_num())));
+                    q.setScore((int) ((q.hard*10)*(1.5 - (double)question.getRight_num()/question.getSum_num())));
                 }
                 else { //如果是简答/编程题，则为难度的20倍
-                    q.setScore((int) ((q.hard*15)*(2 - (double)question.getRight_num()/question.getSum_num())));
+                    q.setScore((int) ((q.hard*10)*(3 - (double)question.getRight_num()/question.getSum_num())));
                 }
 
 //                q.setScore(question.getS);
@@ -111,6 +103,10 @@ public class GeneOP_o
         public void GenerateQuestionDatabase() {
             GetDatabaseForTest(); //初始化questions[]
 
+            //排序
+            SortQuestionByAttribute();
+
+            //生成试卷
             for (int i = 0; i < questionNumber; i++) {
                 Question q = new Question();
                 q.setQuestion_id(i);
@@ -148,7 +144,7 @@ public class GeneOP_o
         // 试题预操作
         public void PreOperation() {
 
-            SortQuestionByAttribute();
+//            SortQuestionByAttribute();
 
             // 初始化
             for (int i = 0; i < 20; i++) {
