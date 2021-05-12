@@ -52,7 +52,7 @@ public class TrainController {
 
         String sub_id = JSON.parseObject(str).get("sub_id").toString();
         Integer user_id = Integer.parseInt(JSON.parseObject(str).get("user_id").toString());
-        Long train_time = Long.parseLong(JSON.parseObject(str).get("train_time").toString());
+        Long last_time = Long.parseLong(JSON.parseObject(str).get("train_time").toString());
 
         //输入参数
         int score = Integer.parseInt(JSON.parseObject(str).get("score").toString());
@@ -99,7 +99,7 @@ public class TrainController {
 
 
         //--将user_id train_time(分钟) sub_id保存到train中-------------
-        trainService.saveUserIdSubIdAndTrainTimeByTrainId(user_id, sub_id, train_time*1000*60, train_id);
+        trainService.saveUserIdSubIdAndTrainTimeByTrainId(user_id, sub_id, last_time*1000*60, train_id);
 
         return AjaxResponse.success(train_id);
     }

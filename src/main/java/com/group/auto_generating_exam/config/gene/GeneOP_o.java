@@ -782,7 +782,9 @@ public class GeneOP_o
             train.setTrain_type(0);
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            train.setTrain_name(sdf.format(new Date()));
+            Date date = new Date();
+            train.setBegin_time(date.getTime());
+            train.setTrain_name(sdf.format(date));
             train.setHard_distribute(Arrays.toString(hardDistribute));
             train.setChapter_distribute(Arrays.toString(chapterDistribute));
             train.setImportance_distribute(Arrays.toString(importanceDistribute));

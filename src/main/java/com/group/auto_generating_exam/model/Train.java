@@ -31,7 +31,10 @@ public class Train implements Serializable {
     private String train_name;
 
     @Column
-    private Long train_time;
+    private Long begin_time;
+
+    @Column
+    private Long last_time;
 
     @Column
     private String sub_id;
