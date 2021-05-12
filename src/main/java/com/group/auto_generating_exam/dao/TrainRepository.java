@@ -24,4 +24,10 @@ public interface TrainRepository extends JpaRepository<Train, Integer> {
 
     @Query("select u from Train u where u.user_id = ?1")
     List<Train> getTrainByUserId(Integer user_id);
+
+    @Query("select s.train_id from Train s where s.train_id = ?1")
+    Integer isTrainExist(Integer train_Id);
+
+    @Query("select s.sub_id from Train s where s.train_id = ?1")
+    String getSubIdByTrainId(Integer train_id);
 }

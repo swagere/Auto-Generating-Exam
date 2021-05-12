@@ -2,6 +2,8 @@ package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
+import com.group.auto_generating_exam.config.exception.CustomException;
+import com.group.auto_generating_exam.config.exception.CustomExceptionType;
 import com.group.auto_generating_exam.config.gene.GeneOP_o;
 import com.group.auto_generating_exam.dao.QuestionRepository;
 import com.group.auto_generating_exam.service.ExamService;
@@ -52,7 +54,7 @@ public class TrainController {
 
         String sub_id = JSON.parseObject(str).get("sub_id").toString();
         Integer user_id = Integer.parseInt(JSON.parseObject(str).get("user_id").toString());
-        Long last_time = Long.parseLong(JSON.parseObject(str).get("train_time").toString());
+        Long last_time = Long.parseLong(JSON.parseObject(str).get("last_time").toString());
 
         //输入参数
         int score = Integer.parseInt(JSON.parseObject(str).get("score").toString());
@@ -132,6 +134,18 @@ public class TrainController {
     @RequestMapping("/getTrainQuestionList")
     public @ResponseBody AjaxResponse getTrainQuestionList (@RequestBody String str, HttpServletRequest httpServletRequest) {
         Integer train_id = Integer.parseInt(JSON.parseObject(str).get("train_id").toString());
+        Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
+
+        //考试是否存在
+        if (!trainService.isTrainExist(train_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试不存在"));
+        }
+
+        //用户是否选择这门课程 即用户是否能参与这个考试
+        Boolean isStuInExam = examService.isStuInExam(train_id, user_id);
+        if (!isStuInExam) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"用户没有选择该课程，不能参与考试"));
+        }
 
         //得到question列表返回给前端
         List<Integer> question_ids = trainService.getQuestionIdByTrainId(train_id);

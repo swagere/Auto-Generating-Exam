@@ -18,4 +18,6 @@ public interface TrainService {
     List<Integer> getQuestionIdByTrainId(Integer train_id);
     List<Train> getAllTrain(Integer user_id);
     Map getTrainQuestionList(List<Integer> questions);
+    Boolean isTrainExist(Integer train_id);
+    Boolean isStuInTrain(Integer train_id, Integer user_id);
 }

@@ -3,6 +3,7 @@ package com.group.auto_generating_exam.service.Impl;
 import com.group.auto_generating_exam.dao.*;
 import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.ExamService;
+import com.group.auto_generating_exam.service.SubjectService;
 import com.group.auto_generating_exam.service.TrainService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,8 @@ public class TrainServiceImpl implements TrainService {
     UserSubjectRepository userSubjectRepository;
     @Autowired
     TestCaseRepository testCaseRepository;
+    @Autowired
+    SubjectService subjectService;
 
 
     //获得章节正确率
@@ -248,6 +251,22 @@ public class TrainServiceImpl implements TrainService {
         return questionList;
     }
 
+    //判断考试是否存在
+    @Override
+    public Boolean isTrainExist(Integer train_id) {
+        Integer train = trainRepository.isTrainExist(train_id);
+        if (train == null) {
+            return false;
+        }
+        return true;
+    }
+
+    //用户是否有该门考试
+    @Override
+    public Boolean isStuInTrain(Integer train_id, Integer user_id) {
+        String sub_id = trainRepository.getSubIdByTrainId(train_id);
+        return subjectService.isStuInSub(sub_id, user_id);
+    }
 
 }
 
