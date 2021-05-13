@@ -27,7 +27,7 @@ public interface TrainQuestionRepository extends JpaRepository<TrainQuestion, Tr
     void saveIsCommit(@Param("is_commit") Integer is_commit, @Param("question_id") Integer question_id, @Param("train_id") Integer train_id);
 
     @Query("select s.score from TrainQuestion s where s.train_id = ?1 and s.question_id = ?2")
-    Integer getScoreByIds(Integer exam_id, Integer question_id);
+    Integer getScoreByIds(Integer train_id, Integer question_id);
 
     @Modifying
     @Transactional

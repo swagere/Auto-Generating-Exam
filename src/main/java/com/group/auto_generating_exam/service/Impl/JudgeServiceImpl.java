@@ -588,7 +588,7 @@ public class JudgeServiceImpl implements JudgeService {
                 judgeResult.setTest_case_res(list);
 
                 //状态 分数 代码 语言
-                int Full = trainQuestionRepository.getScoreByIds(question_id, train_id);
+                int Full = trainQuestionRepository.getScoreByIds(train_id, question_id);
                 if (right == count) {
                     judgeResult.setStatus("答案正确");
                     judgeResult.setScore(Full);
