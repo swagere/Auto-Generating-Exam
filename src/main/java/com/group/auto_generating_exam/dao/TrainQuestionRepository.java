@@ -26,4 +26,12 @@ public interface TrainQuestionRepository extends JpaRepository<TrainQuestion, Tr
     @Query("update TrainQuestion u set u.is_commit = :is_commit where u.question_id = :question_id and u.train_id = :train_id ")
     void saveIsCommit(@Param("is_commit") Integer is_commit, @Param("question_id") Integer question_id, @Param("train_id") Integer train_id);
 
+    @Query("select s.score from TrainQuestion s where s.train_id = ?1 and s.question_id = ?2")
+    Integer getScoreByIds(Integer exam_id, Integer question_id);
+
+    @Modifying
+    @Transactional
+    @Query("update TrainQuestion u set u.answer = :answer where u.question_id = :question_id and u.train_id = :train_id")
+    void saveAnswer(@Param("answer") String answer, @Param("question_id") Integer question_id, @Param("train_id") Integer train_id);
+
 }

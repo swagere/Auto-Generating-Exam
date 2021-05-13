@@ -30,4 +30,7 @@ public class TrainQuestion implements Serializable {
 
     @Column
     private Integer is_commit;
+
+    @Column
+    private Integer score;
 }

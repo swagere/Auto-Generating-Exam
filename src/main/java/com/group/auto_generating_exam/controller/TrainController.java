@@ -1,12 +1,16 @@
 package com.group.auto_generating_exam.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
 import com.group.auto_generating_exam.config.gene.GeneOP_o;
 import com.group.auto_generating_exam.dao.QuestionRepository;
+import com.group.auto_generating_exam.model.GetProgram;
+import com.group.auto_generating_exam.model.JudgeResult;
 import com.group.auto_generating_exam.service.ExamService;
+import com.group.auto_generating_exam.service.JudgeService;
 import com.group.auto_generating_exam.service.TrainService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -36,6 +41,8 @@ public class TrainController {
     TrainService trainService;
     @Autowired
     ExamService examService;
+    @Autowired
+    JudgeService judgeService;
 
 
     /**
@@ -127,8 +134,8 @@ public class TrainController {
     }
 
     /**
-     * 学生开始考试时
-     * 获得试卷列表
+     * 学生开始检测时
+     * 获得检测试卷列表
      * @param httpServletRequest
      * @return
      */
@@ -212,5 +219,27 @@ public class TrainController {
 
         return AjaxResponse.success();
 
+    }
+
+    /**
+     * 学生编程题判题
+     * @param getProgram
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/judgeProgram")
+    public @ResponseBody
+    AjaxResponse judge(@Valid @RequestBody GetProgram getProgram, HttpServletRequest request, HttpServletRequest httpServletRequest) throws Exception {
+//        authorityCheckService.checkStudentAuthority(httpServletRequest.getSession().getAttribute("userInfo"));
+
+//        Map userInfo = (Map) request.getSession().getAttribute("userInfo");
+//        Integer stu_id = (Integer) userInfo.get("id");
+
+        Integer user_id = getProgram.getUser_id();
+        JSONObject json = judgeService.judge(getProgram.getCode(), getProgram.getLanguage(), getProgram.getQuestion_id());
+        log.info("判题成功");
+        JudgeResult judgeResult = judgeService.transformToTrainResult(json, user_id, getProgram.getCode(), getProgram.getLanguage(), getProgram.getQuestion_id(), getProgram.getExam_id());
+        return AjaxResponse.success(judgeResult);
     }
 }

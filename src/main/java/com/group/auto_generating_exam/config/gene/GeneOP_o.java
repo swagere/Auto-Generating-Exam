@@ -78,10 +78,29 @@ public class GeneOP_o
 
                 //选择判断题：原分数为难度的10倍，ratio少则加分，ratio多则减分
                 if (q.kind.equals(0) || q.kind.equals(1)) {
-                    q.setScore((int) ((q.hard*10)*(1.5 - (double)question.getRight_num()/question.getSum_num())));
+                    int s = (int) ((q.hard*20)*(1.5 - (double)question.getRight_num()/question.getSum_num()));
+                    if (s < 1) {
+                        q.setScore(1);
+                    }
+                    else if (s >= 40) {
+                        q.setScore(40);
+                    }
+                    else {
+                        q.setScore(s);
+                    }
+
                 }
                 else { //如果是简答/编程题，则为难度的20倍
-                    q.setScore((int) ((q.hard*10)*(3 - (double)question.getRight_num()/question.getSum_num())));
+                    int s = (int) ((q.hard*20)*(3 - (double)question.getRight_num()/question.getSum_num()));
+                    if (s < 1) {
+                        q.setScore(1);
+                    }
+                    else if (s >= 40) {
+                        q.setScore(40);
+                    }
+                    else {
+                        q.setScore(s);
+                    }
                 }
 
 //                q.setScore(question.getS);
@@ -795,7 +814,7 @@ public class GeneOP_o
 
             //--保存到user_train_question中--------------------------------
             for (int i : chromosome[0]) {
-                TrainQuestion trainQuestion = new TrainQuestion(train_id, i, null, 0, 0);
+                TrainQuestion trainQuestion = new TrainQuestion(train_id, i, null, 0, 0, database.GetQuestionByOrder(i).score);
                 trainQuestionRepository.save(trainQuestion);
             }
 

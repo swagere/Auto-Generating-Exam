@@ -6,10 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.group.auto_generating_exam.config.JudgeConfig.JudgeConfig;
 import com.group.auto_generating_exam.config.exception.CustomException;
 import com.group.auto_generating_exam.config.exception.CustomExceptionType;
-import com.group.auto_generating_exam.dao.ExamQuestionRepository;
-import com.group.auto_generating_exam.dao.TestCaseRepository;
-import com.group.auto_generating_exam.dao.UserExamQuestionRepository;
-import com.group.auto_generating_exam.dao.UserRepository;
+import com.group.auto_generating_exam.dao.*;
 import com.group.auto_generating_exam.model.*;
 import com.group.auto_generating_exam.service.JudgeService;
 import com.group.auto_generating_exam.util.LoadBalanceUtils;
@@ -43,6 +40,8 @@ public class JudgeServiceImpl implements JudgeService {
     ExamQuestionRepository examQuestionRepository;
     @Autowired
     UserExamQuestionRepository userExamQuestionRepository;
+    @Autowired
+    TrainQuestionRepository trainQuestionRepository;
 
     //负责文件写入的线程池
     //TODO 需交将此处改为手动设置参数，创建线程池
@@ -423,7 +422,7 @@ public class JudgeServiceImpl implements JudgeService {
 
     //将judge的结果转化：存入数据库/传给前端
     @Override
-    public JudgeResult transformToResult(JSONObject json, Integer user_id, String code, String language, Integer question_id, Integer exam_id) {
+    public JudgeResult transformToExamResult(JSONObject json, Integer user_id, String code, String language, Integer question_id, Integer exam_id) {
         JudgeResult judgeResult = new JudgeResult();
         try {
             String err = json.getString("err");
@@ -544,5 +543,76 @@ public class JudgeServiceImpl implements JudgeService {
 
         }
         return str;
+    }
+
+    //将judge的结果转化：存入数据库/传给前端
+    @Override
+    public JudgeResult transformToTrainResult(JSONObject json, Integer user_id, String code, String language, Integer question_id, Integer train_id) {
+        JudgeResult judgeResult = new JudgeResult();
+        try {
+            String err = json.getString("err");
+            if (err == null) {
+                //编译成功 返回的json串
+                judgeResult.setCompile_error(false);
+                judgeResult.setError_message(null);
+
+                judgeResult.setCode(code);
+                judgeResult.setLanguage(language);
+
+                //获取用户名
+                judgeResult.setUsername(userRepository.getNameByUserId(user_id));
+
+                //获取测试用例结果列表
+                int count = 0;
+                int right = 0;  //正确测试用例的个数
+                ArrayList<TestCaseRes> list = new ArrayList<>();
+                JSONArray test_case_res = json.getJSONArray("data");
+                for (Object test_case : test_case_res) {
+                    TestCaseRes testCaseRes = new TestCaseRes();
+                    JSONObject res = (JSONObject) test_case;
+                    testCaseRes.setCase_num(Integer.valueOf(res.get("test_case").toString()));
+                    testCaseRes.setRun_time(res.get("real_time").toString() + "ms");
+                    Double memory = Double.parseDouble(res.get("memory").toString()) /1024 /1024;
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    String memoryStr = df.format(memory.floatValue());
+                    testCaseRes.setMemory(memoryStr  + "KB");  //单位
+                    int result = Integer.parseInt(res.get("result").toString());
+                    String judgeres = getJudgeResult(result);
+                    if (judgeres.equals("答案正确")) {
+                        right++;
+                    }
+                    testCaseRes.setResult(judgeres);
+                    list.add(testCaseRes);
+                    count++;
+                }
+                judgeResult.setTest_case_res(list);
+
+                //状态 分数 代码 语言
+                int Full = trainQuestionRepository.getScoreByIds(question_id, train_id);
+                if (right == count) {
+                    judgeResult.setStatus("答案正确");
+                    judgeResult.setScore(Full);
+                    trainQuestionRepository.saveAnswer(code, question_id, train_id);
+                } else if (right < count && right > 0) {
+                    judgeResult.setStatus("部分正确");
+                    judgeResult.setScore(right * Full / count);
+                    trainQuestionRepository.saveAnswer(code, question_id, train_id);
+                } else if (right == 0) {
+                    judgeResult.setStatus("答案错误");
+                    judgeResult.setScore(0);
+                    trainQuestionRepository.saveAnswer(code, question_id, train_id);
+                }
+
+//                //题号
+//                judgeResult.setNum(examQuestionRepository.findNumById(question_id, exam_id));
+            } else {
+                //编译失败
+                judgeResult.setCompile_error(true);
+                judgeResult.setError_message(json.getString("data"));
+            }
+            return judgeResult;
+        }catch (Exception e) {
+            throw new CustomException(CustomExceptionType.SYSTEM_ERROR, "判题结果为空");
+        }
     }
 }

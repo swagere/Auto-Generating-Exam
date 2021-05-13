@@ -24,9 +24,12 @@ public interface JudgeService {
 
     String transformToMd5(String output);
 
-    JudgeResult transformToResult(JSONObject json, Integer user_id, String code, String language, Integer question_id, Integer exam_id);
+    JudgeResult transformToExamResult(JSONObject json, Integer user_id, String code, String language, Integer question_id, Integer exam_id);
 
     ArrayList<String> getFileNames(Integer question_id);
 
     String getJudgeResult(int result);
+
+    JudgeResult transformToTrainResult(JSONObject json, Integer user_id, String code, String language, Integer question_id, Integer exam_id);
+
 }
