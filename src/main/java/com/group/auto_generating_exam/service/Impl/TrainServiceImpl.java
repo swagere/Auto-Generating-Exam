@@ -324,5 +324,115 @@ public class TrainServiceImpl implements TrainService {
         trainQuestionRepository.saveIsCommit(is_commit, question_id, train_id);
     }
 
+    //返回考试持续时间
+    @Override
+    public Long getLastTime(Integer train_id) {
+        return trainRepository.getLastTimeByTrainId(train_id);
+    }
+
+    //返回考试剩余时间 如果考试未开始则返回null
+    @Override
+    public Long getRestTimeByTrainId(Integer train_id, Long last_time) {
+        Long begin_time = trainRepository.getBeginTimeByTrainId(train_id);
+        Long now_time = System.currentTimeMillis();
+        return last_time - (now_time - begin_time);
+    }
+
+    //存储学生答案
+    @Override
+    public void saveAnswer(String answer, Integer question_id, Integer train_id) {
+        trainQuestionRepository.saveAnswer(answer, question_id, train_id);
+    }
+
+    //所有学生选择题判断题 判分 并保存结果（exam/UserExamQuestion）【计算right_ratio并一起存入数据库】
+    @Override
+    public void judgeGeneralQuestion(Integer train_id) {
+        //userExamQuestion:score is_judge is_right
+        List<TrainQuestion> trainQuestions = trainQuestionRepository.getTrainQuestionByTrainId(train_id);
+        for (TrainQuestion trainQuestion : trainQuestions) {
+            Integer question_id = trainQuestion.getQuestion_id();
+            Integer kind = questionRepository.getKindById(question_id);
+            if (kind.equals(2)) {
+                //is_right存入2
+                trainQuestionRepository.saveIsRight(2, question_id, train_id);
+                continue;
+            }
+            else if (kind.equals(3) || kind.equals(4)) { //编程题已存is_right
+                continue;
+            }
+            else {
+                if (trainQuestion.getAnswer() != null && trainQuestion.getAnswer().equals(questionRepository.getAnswerByQuestionId(question_id))){
+                    //答案正确
+                    trainQuestionRepository.saveIsRight(2, question_id, train_id);
+                    //question:right_num sum_num
+                    Question question = questionRepository.getQuestionByQuestionId(question_id);
+                    questionRepository.saveRightNumAndSumNum(question.getRight_num()+ 1, question.getSum_num() + 1, question_id);
+
+                    //user_subject:
+                    //chapter_right_count
+                    //chapter_count
+                    Integer chapter = question.getChapter();
+                    List<Integer> chapter_right_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> chapter_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterCount(question.getSub_id(), question.getUser_id()));
+                    chapter_right_count.set(chapter, chapter_right_count.get(chapter) + 1);
+                    chapter_count.set(chapter, chapter_count.get(chapter) + 1);
+                    userSubjectRepository.saveChapter(chapter_right_count.toString(), chapter_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //hard_right_count
+                    //hard_count
+                    Integer hard = question.HardN();
+                    List<Integer> hard_right_count = ToolUtil.String2ListInt(userSubjectRepository.getHardRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> hard_count = ToolUtil.String2ListInt(userSubjectRepository.getHardCount(question.getSub_id(), question.getUser_id()));
+                    hard_right_count.set(hard, hard_right_count.get(chapter) + 1);
+                    hard_count.set(hard, hard_count.get(chapter) + 1);
+                    userSubjectRepository.saveHard(hard_right_count.toString(), hard_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //importance_right_count
+                    //importance_count
+                    Integer impo = question.ImportanceN();
+                    List<Integer> importance_right_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceRightCount(question.getSub_id(), question.getUser_id()));
+                    List<Integer> importance_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceCount(question.getSub_id(), question.getUser_id()));
+                    importance_right_count.set(impo, importance_right_count.get(chapter) + 1);
+                    importance_count.set(impo, importance_count.get(chapter) + 1);
+                    userSubjectRepository.saveImportance(importance_right_count.toString(), importance_count.toString(), question.getSub_id(), question.getUser_id());
+
+                }
+                else {
+                    //答案错误
+                    trainQuestionRepository.saveIsRight(0, question_id, train_id);
+                    //question:right_num sum_num
+                    Question question = questionRepository.getQuestionByQuestionId(question_id);
+                    questionRepository.saveSumNum( question.getSum_num() + 1, question_id);
+
+                    //user_subject:
+                    //chapter_right_count
+                    //chapter_count
+                    Integer chapter = question.getChapter();
+                    List<Integer> chapter_count = ToolUtil.String2ListInt(userSubjectRepository.getChapterCount(question.getSub_id(), question.getUser_id()));
+                    chapter_count.set(chapter, chapter_count.get(chapter) + 1);
+                    userSubjectRepository.saveChapterCount(chapter_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //hard_right_count
+                    //hard_count
+                    Integer hard = question.HardN();
+                    List<Integer> hard_count = ToolUtil.String2ListInt(userSubjectRepository.getHardCount(question.getSub_id(), question.getUser_id()));
+                    hard_count.set(hard, hard_count.get(chapter) + 1);
+                    userSubjectRepository.saveHardCount( hard_count.toString(), question.getSub_id(), question.getUser_id());
+
+                    //importance_right_count
+                    //importance_count
+                    Integer impo = question.ImportanceN();
+                    List<Integer> importance_count = ToolUtil.String2ListInt(userSubjectRepository.getImportanceCount(question.getSub_id(), question.getUser_id()));
+                    importance_count.set(impo, importance_count.get(chapter) + 1);
+                    userSubjectRepository.saveImportanceCount(importance_count.toString(), question.getSub_id(), question.getUser_id());
+
+
+
+                }
+
+            }
+
+        }
+    }
 }
 

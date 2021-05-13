@@ -25,4 +25,8 @@ public interface TrainService {
     List<Integer> getTrainQuestionIds(Integer train_id);
     Boolean isCommit(Integer train_id);
     void saveIsCommit(Integer is_commit, Integer question_id, Integer train_id);
+    Long getLastTime(Integer train_id);
+    Long getRestTimeByTrainId(Integer train_id, Long last_time);
+    void saveAnswer(String answer, Integer question_id, Integer train_id);
+    void judgeGeneralQuestion(Integer train_id);
 }

@@ -57,7 +57,6 @@ public class TestQuestion implements Serializable {
     public int ScoreN() {
         int[] scoreRange = {2,3,4,5,6,8,10,20,30,50};
 
-        System.out.println(score);
         for (int n = 0; n < 10; n++) {
             if (score >= scoreRange[n] && score < scoreRange[n + 1]) {
                 return n;

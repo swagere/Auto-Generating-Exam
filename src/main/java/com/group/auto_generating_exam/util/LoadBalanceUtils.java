@@ -47,7 +47,7 @@ public class LoadBalanceUtils {
         return url_map.get(max);
     }
     private static Integer getMinCount() {
-        System.out.println("count: " + count.toString());
+//        System.out.println("count: " + count.toString());
         Integer ret = 0;
         Integer min = count.get(0);
         boolean isAllEqual = true;

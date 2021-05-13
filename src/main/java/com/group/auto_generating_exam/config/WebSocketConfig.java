@@ -2,6 +2,7 @@ package com.group.auto_generating_exam.config;
 
 import com.group.auto_generating_exam.controller.WebSocketServer;
 import com.group.auto_generating_exam.service.ExamService;
+import com.group.auto_generating_exam.service.TrainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,5 +19,10 @@ public class WebSocketConfig {
     @Autowired
     public void examService(ExamService examService){
         WebSocketServer.examService = examService;
+    }
+
+    @Autowired
+    public void trainService(TrainService trainService) {
+        WebSocketServer.trainService = trainService;
     }
 }

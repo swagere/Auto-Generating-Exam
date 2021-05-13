@@ -371,7 +371,7 @@ public class JudgeServiceImpl implements JudgeService {
                 String line;
                 while ((line = in.readLine()) != null){
                     result.append(line);
-                    System.out.println(line);
+//                    System.out.println(line);
                 }
             }else{
                 System.out.println("ResponseCode is an error code:" + conn.getResponseCode());
@@ -593,14 +593,17 @@ public class JudgeServiceImpl implements JudgeService {
                     judgeResult.setStatus("答案正确");
                     judgeResult.setScore(Full);
                     trainQuestionRepository.saveAnswer(code, question_id, train_id);
+                    trainQuestionRepository.saveIsRight(2, question_id, train_id);
                 } else if (right < count && right > 0) {
                     judgeResult.setStatus("部分正确");
                     judgeResult.setScore(right * Full / count);
                     trainQuestionRepository.saveAnswer(code, question_id, train_id);
+                    trainQuestionRepository.saveIsRight(1, question_id, train_id);
                 } else if (right == 0) {
                     judgeResult.setStatus("答案错误");
                     judgeResult.setScore(0);
                     trainQuestionRepository.saveAnswer(code, question_id, train_id);
+                    trainQuestionRepository.saveIsRight(0, question_id, train_id);
                 }
 
 //                //题号
