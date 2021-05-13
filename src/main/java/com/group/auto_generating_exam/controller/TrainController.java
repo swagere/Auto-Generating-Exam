@@ -12,6 +12,7 @@ import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -138,13 +139,13 @@ public class TrainController {
 
         //考试是否存在
         if (!trainService.isTrainExist(train_id)) {
-            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该考试不存在"));
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR, "该考试不存在"));
         }
 
         //用户是否选择这门课程 即用户是否能参与这个考试
-        Boolean isStuInExam = examService.isStuInExam(train_id, user_id);
+        Boolean isStuInExam = trainService.isStuInTrain(train_id, user_id);
         if (!isStuInExam) {
-            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"用户没有选择该课程，不能参与考试"));
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR, "用户没有选择该课程，不能参与考试"));
         }
 
         //得到question列表返回给前端
@@ -154,5 +155,62 @@ public class TrainController {
         Map questionList = trainService.getTrainQuestionList(question_ids);
 
         return AjaxResponse.success(questionList);
+    }
+
+    /**
+     * 学生交卷
+     */
+    @PostMapping("/handInTrain")
+    public @ResponseBody AjaxResponse handInTrain(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        //停止该考生的考试：查找出该考生的所有考题 并设置is_commit字段
+        Integer train_id = Integer.valueOf(JSON.parseObject(str).get("train_id").toString());
+        Integer user_id = Integer.valueOf(JSON.parseObject(str).get("user_id").toString()); //后期改成从登陆状态中获取用户user_id
+
+
+        //考试是否存在
+        if (!trainService.isTrainExist(train_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR, "该检测不存在"));
+//            result.put("message","用户没有选择该课程，该考试不存在");
+        }
+        //用户是否选择这门课程 即用户是否能参与这个考试
+        Boolean isStuInTrain = trainService.isStuInTrain(train_id, user_id);
+        if (!isStuInTrain) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR, "用户没有选择该课程，不能参与该检测"));
+//            result.put("message","用户没有选择该课程，不能参与考试");
+        }
+        //检测是否超过考试时间(//判断是否为该考试结束一分钟之后交试卷)/还未开始考试 若超过考试时间则不能考试
+        String progress_status = trainService.trainIsProgressing(train_id);
+        if (progress_status.equals("will")) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR, "该检测还未开始"));
+        }
+        if (progress_status.equals("over")) {
+            //判断是否为该考试结束一分钟之后交卷
+            if (trainService.isTrainDoneOverOne(train_id)) {
+                return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR, "该检测已结束，不能再提交检测"));
+//                result.put("message","该考试已结束，不能再提交试卷");
+            }
+        }
+
+        //检测是否已经分发给他试卷 若没有分发试卷则判定无法交卷
+        List<Integer> questionIds = trainService.getTrainQuestionIds(train_id);
+        if (questionIds.isEmpty()) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"该学生还未得到检测"));
+//            result.put("message","该学生还未得到试卷");
+        }
+
+
+        //检测是否已经交卷 若已交卷则不能再次交卷
+        if (trainService.isCommit(train_id)) {
+            return AjaxResponse.error(new CustomException(CustomExceptionType.USER_INPUT_ERROR,"用户已交卷"));
+//            result.put("message","用户已交卷");
+        }
+
+        //可以停止该考生考试
+        for (Integer question_id : questionIds) {
+            trainService.saveIsCommit(1, question_id, train_id);
+        }
+
+        return AjaxResponse.success();
+
     }
 }

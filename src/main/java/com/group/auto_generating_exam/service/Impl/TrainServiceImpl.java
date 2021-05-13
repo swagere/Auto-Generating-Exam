@@ -36,7 +36,7 @@ public class TrainServiceImpl implements TrainService {
     @Autowired
     QuestionRepository questionRepository;
     @Autowired
-    TrainQuestionRepository userTrainQuestionRepository;
+    TrainQuestionRepository trainQuestionRepository;
     @Autowired
     UserSubjectRepository userSubjectRepository;
     @Autowired
@@ -182,7 +182,7 @@ public class TrainServiceImpl implements TrainService {
     //根train_id获得question_ids
     @Override
     public List<Integer> getQuestionIdByTrainId(Integer train_id) {
-        return userTrainQuestionRepository.getQuestionIdByTrainId(train_id);
+        return trainQuestionRepository.getQuestionIdByTrainId(train_id);
     }
 
     //获得一个用户所有train试卷
@@ -251,7 +251,7 @@ public class TrainServiceImpl implements TrainService {
         return questionList;
     }
 
-    //判断考试是否存在
+    //判断检测是否存在
     @Override
     public Boolean isTrainExist(Integer train_id) {
         Integer train = trainRepository.isTrainExist(train_id);
@@ -261,11 +261,67 @@ public class TrainServiceImpl implements TrainService {
         return true;
     }
 
-    //用户是否有该门考试
+    //用户是否有该门检测
     @Override
     public Boolean isStuInTrain(Integer train_id, Integer user_id) {
         String sub_id = trainRepository.getSubIdByTrainId(train_id);
         return subjectService.isStuInSub(sub_id, user_id);
+    }
+
+    //判断检测是否正在进行
+    @Override
+    public String trainIsProgressing(Integer train_id) {
+        //判断考试时间是否开始 考试是否结束
+        Long train_time = trainRepository.getBeginTimeByTrainId(train_id);
+        Long last_time = trainRepository.getLastTimeByTrainId(train_id);
+        Long now_time = System.currentTimeMillis();
+
+        if (train_time > now_time) {
+            return "will";
+        }
+        else if (train_time + last_time < now_time) {
+            return "over";
+        }
+        return "ing";
+    }
+
+    //判断考试是否结束超过一分钟(前提：考试已结束)
+    @Override
+    public Boolean isTrainDoneOverOne(Integer train_id) {
+        //判断考试是否结束超过一分钟
+        Long exam_time = trainRepository.getBeginTimeByTrainId(train_id);
+        Long last_time = trainRepository.getLastTimeByTrainId(train_id);
+        Long now_time = System.currentTimeMillis();
+
+        if (now_time - exam_time - last_time > 60 * 1000) {
+            return true;
+        }
+        return false;
+    }
+
+    //查询学生已获取试卷的题号列表（train_question）
+    @Override
+    public List<Integer> getTrainQuestionIds(Integer train_id) {
+        return trainQuestionRepository.getQuestionIdByTrainId(train_id);
+    }
+
+    //用户是否已交卷
+    @Override
+    public Boolean isCommit(Integer train_id) {
+        List<TrainQuestion> list = trainQuestionRepository.getTrainQuestion(train_id);
+        if (!list.isEmpty()) {
+            Integer isCommit = list.get(0).getIs_commit();
+            if (isCommit == 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //存储是否交卷字段
+    @Override
+    public void saveIsCommit(Integer is_commit, Integer question_id, Integer train_id) {
+        trainQuestionRepository.saveIsCommit(is_commit, question_id, train_id);
     }
 
 }

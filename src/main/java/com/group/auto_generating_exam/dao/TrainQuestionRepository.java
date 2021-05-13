@@ -20,4 +20,10 @@ public interface TrainQuestionRepository extends JpaRepository<TrainQuestion, Tr
 
     @Query("select u.question_id from TrainQuestion u where u.train_id = ?1")
     List<Integer> getQuestionIdByTrainId(Integer train_id);
+
+    @Modifying
+    @Transactional
+    @Query("update TrainQuestion u set u.is_commit = :is_commit where u.question_id = :question_id and u.train_id = :train_id ")
+    void saveIsCommit(@Param("is_commit") Integer is_commit, @Param("question_id") Integer question_id, @Param("train_id") Integer train_id);
+
 }

@@ -20,4 +20,9 @@ public interface TrainService {
     Map getTrainQuestionList(List<Integer> questions);
     Boolean isTrainExist(Integer train_id);
     Boolean isStuInTrain(Integer train_id, Integer user_id);
+    String trainIsProgressing(Integer train_id);
+    Boolean isTrainDoneOverOne(Integer train_id);
+    List<Integer> getTrainQuestionIds(Integer train_id);
+    Boolean isCommit(Integer train_id);
+    void saveIsCommit(Integer is_commit, Integer question_id, Integer train_id);
 }

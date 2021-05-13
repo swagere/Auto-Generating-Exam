@@ -30,4 +30,11 @@ public interface TrainRepository extends JpaRepository<Train, Integer> {
 
     @Query("select s.sub_id from Train s where s.train_id = ?1")
     String getSubIdByTrainId(Integer train_id);
+
+    @Query("select s.begin_time from Train s where s.train_id = ?1")
+    Long getBeginTimeByTrainId(Integer train_id);
+
+    @Query("select s.last_time from Train s where s.train_id = ?1")
+    Long getLastTimeByTrainId(Integer train_id);
+
 }
