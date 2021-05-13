@@ -580,7 +580,8 @@ public class GeneOP_o
                     for (int k = 0; k < testKind[nKind]; k++) {
                         // 生成一套卷子
                         // 随机取得一道题的编号
-                        chromosome[i][count ++] = database.GetRandQuestionOrderInSameCluster(clusterTheme[count]);
+                        chromosome[i][count] = database.GetRandQuestionOrderInSameCluster(clusterTheme[count]);
+                        count++;
                     }
                 }
             }
@@ -867,6 +868,7 @@ public class GeneOP_o
 
             //--在高分辨率下使用遗传算法--------------------------
             // 根据前面所选出的最好的组卷模式
+            System.out.println(Arrays.toString(clusterTheme));
             initialGroup_highResolution();
 
             for (int iteration = 0; iteration < 200; iteration++) {
