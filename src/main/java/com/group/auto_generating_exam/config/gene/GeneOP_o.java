@@ -868,7 +868,6 @@ public class GeneOP_o
 
             //--在高分辨率下使用遗传算法--------------------------
             // 根据前面所选出的最好的组卷模式
-            System.out.println(Arrays.toString(clusterTheme));
             initialGroup_highResolution();
 
             for (int iteration = 0; iteration < 200; iteration++) {
