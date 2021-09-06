@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.group.auto_generating_exam.config.exception.AjaxResponse;
 import com.group.auto_generating_exam.model.Question;
 import com.group.auto_generating_exam.model.Subject;
+import com.group.auto_generating_exam.model.Train;
 import com.group.auto_generating_exam.model.UserSubject;
 import com.group.auto_generating_exam.service.ExamService;
 import com.group.auto_generating_exam.service.SubjectService;
+import com.group.auto_generating_exam.service.TrainService;
 import com.group.auto_generating_exam.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,8 @@ public class ViewController {
     ExamService examService;
     @Autowired
     SubjectService subjectService;
+    @Autowired
+    TrainService trainService;
 
     /**
      * 获得一门课程知识点正确率
@@ -139,6 +143,26 @@ public class ViewController {
         }
 
         res.put("chapter_importance", res_2);
+        return AjaxResponse.success(res);
+    }
+
+
+
+    /**
+     * 获得学生一门检测的所有
+     *
+     * */
+    @PostMapping("/stuExam")
+    public @ResponseBody AjaxResponse getStuExam(@RequestBody String str, HttpServletRequest httpServletRequest) {
+        Integer train_id = Integer.parseInt(JSON.parseObject(str).get("train_id").toString());
+
+        Train train = trainService.getTrainByTrainId(train_id);
+
+        Map res = new HashMap();
+        res.put("hard_distribute", train.getHard_distribute());
+        res.put("chapter_distribute", train.getChapter_distribute());
+        res.put("importance_distribute", train.getImportance_distribute());
+
         return AjaxResponse.success(res);
     }
 }

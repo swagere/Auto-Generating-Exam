@@ -1,5 +1,6 @@
 package com.group.auto_generating_exam.config.gene;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import com.group.auto_generating_exam.util.TimeUtils;
@@ -15,13 +16,24 @@ import com.group.auto_generating_exam.util.TimeUtils;
  *
  */
 
-public class
-BasicGene {
+public class BasicGene {
+    public static void main(String[] args) {
+        IntelligentTestSystem intelligentTestSystem = new IntelligentTestSystem();
+        intelligentTestSystem.Initial();
+
+        for (int epoch = 0; epoch < 1000; epoch++) {
+            intelligentTestSystem.CalculateFitness();
+            intelligentTestSystem.Sort();
+            intelligentTestSystem.Generate();
+        }
+
+        System.out.println(Arrays.toString(intelligentTestSystem.chromosome[0]));
+    }
 
     public static class IntelligentTestSystem
     {
-        static int population=100;           // 种群个数
-        static int geneNumber = 2;          //每个个体（染色体）所用的基因个数
+        int population=100;           // 种群个数
+        int geneNumber = 2;          //每个个体（染色体）所用的基因个数
 
 
 //        double[,] chromosome = new double[population, geneNumber];  //每个个体（染色体）的种群
@@ -48,6 +60,7 @@ BasicGene {
         //初始化
        public void Initial() {
             InitialSample();
+            Thread t = new Thread();
 
             Date date=new Date();
             Random rand = new Random(5 * (int) TimeUtils.getSecondTimestamp(date));

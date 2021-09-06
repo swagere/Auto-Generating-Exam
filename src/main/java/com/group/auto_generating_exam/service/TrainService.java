@@ -29,4 +29,5 @@ public interface TrainService {
     Long getRestTimeByTrainId(Integer train_id, Long last_time);
     void saveAnswer(String answer, Integer question_id, Integer train_id);
     void judgeGeneralQuestion(Integer train_id);
+    Train getTrainByTrainId(Integer train_id);
 }

@@ -434,5 +434,11 @@ public class TrainServiceImpl implements TrainService {
 
         }
     }
+
+    //根据train_id获得train
+    @Override
+    public Train getTrainByTrainId(Integer train_id) {
+        return trainRepository.getTrainByTrainId(train_id);
+    }
 }
 
